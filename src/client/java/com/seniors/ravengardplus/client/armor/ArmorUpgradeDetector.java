@@ -28,8 +28,8 @@ public final class ArmorUpgradeDetector {
 			return false;
 		}
 
-		long candidateDefense = LoreValueParser.find(candidate, "Defense", true);
-		long equippedDefense = LoreValueParser.find(player.getItemBySlot(equippable.slot()), "Defense", true);
+		double candidateDefense = LoreValueParser.find(candidate, "Defense");
+		double equippedDefense = LoreValueParser.find(player.getItemBySlot(equippable.slot()), "Defense");
 		return candidateDefense >= 0 && candidateDefense > equippedDefense;
 	}
 }

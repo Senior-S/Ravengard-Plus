@@ -1,21 +1,21 @@
 package com.seniors.ravengardplus.client.item;
 
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 
 public final class LoreValueParser {
 	private LoreValueParser() {
 	}
 
 	public static double find(ItemStack stack, String label) {
-		ItemLore lore = stack.get(DataComponents.LORE);
+		LoreComponent lore = stack.get(DataComponentTypes.LORE);
 		if (lore == null) {
 			return -1;
 		}
 
-		for (Component line : lore.lines()) {
+		for (Text line : lore.lines()) {
 			String text = line.getString();
 			int labelStart = text.lastIndexOf(label);
 			int labelEnd = labelStart + label.length();

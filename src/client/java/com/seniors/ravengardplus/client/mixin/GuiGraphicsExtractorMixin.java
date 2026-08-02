@@ -34,7 +34,7 @@ public class GuiGraphicsExtractorMixin {
 			return;
 		}
 
-		long value = LoreValueParser.find(stack, "Crowns", false);
+		double value = LoreValueParser.find(stack, "Crowns");
 		if (value < 0) {
 			return;
 		}
