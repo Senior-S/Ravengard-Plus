@@ -1,0 +1,38 @@
+# Gradle and compiled output
+/.gradle/
+/build/
+/out/
+/classes/
+/bin/
+
+# IDE files
+.idea/
+.vscode/
+.settings/
+*.iml
+*.ipr
+*.iws
+*.launch
+.classpath
+.project
+
+# Fabric development runtime
+/run/
+/logs/
+/crash-reports/
+/saves/
+/screenshots/
+/config/
+/mods/
+/resourcepacks/
+
+# Java diagnostics
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
