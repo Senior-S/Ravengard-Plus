@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "com.seniors.ravengardplus.client.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"DrawContextMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

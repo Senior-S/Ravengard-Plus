@@ -5,7 +5,7 @@
 <h1 align="center">Ravengard Plus</h1>
 
 <p align="center">
-  Client-side item utilities for Hypixel Ravengard on Minecraft 26.2.
+  Client-side item utilities for Hypixel Ravengard on Minecraft 1.21.5-1.21.11 and 26.2.
 </p>
 
 Ravengard Plus adds clear inventory markers for item value and equipment upgrades. Every feature is visual and runs on the client.
@@ -38,11 +38,32 @@ The menu is powered by [YetAnotherConfigLib](https://modrinth.com/mod/yacl) and 
 
 ## Installation
 
-1. Install [Fabric](https://fabricmc.net/use/installer/) for Minecraft 26.2.
+1. Install [Fabric](https://fabricmc.net/use/installer/) for your Minecraft version.
 2. Add [Fabric API](https://modrinth.com/mod/fabric-api) and [YetAnotherConfigLib](https://modrinth.com/mod/yacl) to the `mods` folder.
-3. Add the Ravengard Plus jar to the same folder.
+3. Add the matching Ravengard Plus jar to the same folder.
 
-Ravengard Plus requires Java 25, Fabric Loader 0.19.3 or newer, and YACL 3.9.5 or newer for Minecraft 26.2.
+| Minecraft | Ravengard Plus jar | Java | YACL |
+| --- | --- | --- | --- |
+| 1.21.5-1.21.11 | `+mc1.21.5-1.21.11` | 21 or newer | 3.8.2 or newer for your Minecraft version |
+| 26.2 | `+mc26.2` | 25 or newer | 3.9.5 or newer for Minecraft 26.2 |
+
+Both versions require Fabric Loader 0.19.3 or newer.
+
+## Building from source
+
+Build the Minecraft 26.2 jar with Java 25:
+
+```shell
+./gradlew build
+```
+
+Build the Minecraft 1.21.5-1.21.11 jar with Java 21 or newer:
+
+```shell
+./gradlew -p legacy build
+```
+
+The jars are written to `build/libs` and `legacy/build/libs`, respectively.
 
 ## Disclaimer
 
