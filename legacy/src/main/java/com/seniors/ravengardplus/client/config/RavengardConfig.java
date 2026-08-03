@@ -28,6 +28,7 @@ import java.util.List;
 public class RavengardConfig {
 	private static final Color DEFAULT_MEDIUM_COLOR = new Color(0x55FF55);
 	private static final Color DEFAULT_HIGH_COLOR = new Color(0xFF5555);
+	private static final Color DEFAULT_CROWN_GLYPH_COLOR = new Color(0xFFD34E);
 	private static final Color DEFAULT_ARMOR_UPGRADE_COLOR = new Color(0x55FF7F);
 	private static final Color DEFAULT_ACCESSORY_UPGRADE_COLOR = new Color(0x55D6FF);
 
@@ -45,6 +46,21 @@ public class RavengardConfig {
 
 	@SerialEntry
 	public BorderStyle crownBorderStyle = BorderStyle.SOFT_TINT;
+
+	@SerialEntry
+	public boolean crownValueOverlayEnabled = false;
+
+	@SerialEntry
+	public boolean crownValueOverlayShowGlyph = true;
+
+	@SerialEntry
+	public Color crownValueOverlayColor = Color.WHITE;
+
+	@SerialEntry
+	public Color crownValueOverlayGlyphColor = DEFAULT_CROWN_GLYPH_COLOR;
+
+	@SerialEntry
+	public boolean inventoryTotalEnabled = true;
 
 	@SerialEntry
 	public boolean armorUpgradeIndicatorEnabled = true;
@@ -81,6 +97,33 @@ public class RavengardConfig {
 								.description(OptionDescription.of(Text.translatable("ravengard-plus.config.border_style.description")))
 								.binding(BorderStyle.SOFT_TINT, () -> config.crownBorderStyle, value -> config.crownBorderStyle = value)
 								.controller(option -> EnumControllerBuilder.create(option).enumClass(BorderStyle.class))
+								.build())
+						.option(Option.<Boolean>createBuilder()
+								.name(Text.translatable("ravengard-plus.config.crown_value_overlay"))
+								.description(OptionDescription.of(Text.translatable("ravengard-plus.config.crown_value_overlay.description")))
+								.binding(false, () -> config.crownValueOverlayEnabled, value -> config.crownValueOverlayEnabled = value)
+								.controller(BooleanControllerBuilder::create)
+								.build())
+						.option(Option.<Boolean>createBuilder()
+								.name(Text.translatable("ravengard-plus.config.crown_value_overlay_glyph"))
+								.binding(true, () -> config.crownValueOverlayShowGlyph, value -> config.crownValueOverlayShowGlyph = value)
+								.controller(BooleanControllerBuilder::create)
+								.build())
+						.option(Option.<Color>createBuilder()
+								.name(Text.translatable("ravengard-plus.config.crown_value_overlay_color"))
+								.binding(Color.WHITE, () -> config.crownValueOverlayColor, value -> config.crownValueOverlayColor = value)
+								.controller(ColorControllerBuilder::create)
+								.build())
+						.option(Option.<Color>createBuilder()
+								.name(Text.translatable("ravengard-plus.config.crown_value_overlay_glyph_color"))
+								.binding(DEFAULT_CROWN_GLYPH_COLOR, () -> config.crownValueOverlayGlyphColor, value -> config.crownValueOverlayGlyphColor = value)
+								.controller(ColorControllerBuilder::create)
+								.build())
+						.option(Option.<Boolean>createBuilder()
+								.name(Text.translatable("ravengard-plus.config.inventory_total"))
+								.description(OptionDescription.of(Text.translatable("ravengard-plus.config.inventory_total.description")))
+								.binding(true, () -> config.inventoryTotalEnabled, value -> config.inventoryTotalEnabled = value)
+								.controller(BooleanControllerBuilder::create)
 								.build())
 						.option(ButtonOption.createBuilder()
 								.name(Text.translatable("ravengard-plus.config.add_tier"))

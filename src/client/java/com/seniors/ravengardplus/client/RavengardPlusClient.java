@@ -1,12 +1,16 @@
 package com.seniors.ravengardplus.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.seniors.ravengardplus.client.accessory.AccessoryUpgradeDetector;
+import com.seniors.ravengardplus.client.armor.ArmorUpgradeDetector;
 import com.seniors.ravengardplus.client.config.RavengardConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
 
 public class RavengardPlusClient implements ClientModInitializer {
 	public static final String MOD_ID = "ravengard-plus";
@@ -23,6 +27,15 @@ public class RavengardPlusClient implements ClientModInitializer {
 		));
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			Iterable<ItemStack> candidates = null;
+			if (client.player != null) {
+				candidates = client.gui.screen() instanceof AbstractContainerScreen<?> screen
+						? screen.getMenu().getItems()
+						: client.player.getInventory().getNonEquipmentItems();
+			}
+			ArmorUpgradeDetector.update(client.player, candidates);
+			AccessoryUpgradeDetector.update(client.player, candidates);
+
 			while (openConfig.consumeClick()) {
 				client.gui.setScreen(RavengardConfig.createScreen(client.gui.screen()));
 			}

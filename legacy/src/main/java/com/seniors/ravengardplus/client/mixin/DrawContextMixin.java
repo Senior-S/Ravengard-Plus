@@ -4,10 +4,14 @@ import com.seniors.ravengardplus.client.accessory.AccessoryUpgradeDetector;
 import com.seniors.ravengardplus.client.armor.ArmorUpgradeDetector;
 import com.seniors.ravengardplus.client.config.RavengardConfig;
 import com.seniors.ravengardplus.client.item.LoreValueParser;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import org.joml.Matrix3x2fStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,9 +20,22 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.Color;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 @Mixin(DrawContext.class)
 public class DrawContextMixin {
+	@Unique
+	private static final float ravengardPlus$CROWN_VALUE_SCALE = 0.6F;
+	@Unique
+	private static Method ravengardPlus$getMatrices;
+	@Unique
+	private static Method ravengardPlus$pushMatrices;
+	@Unique
+	private static Method ravengardPlus$scaleMatrices;
+	@Unique
+	private static Method ravengardPlus$popMatrices;
+
 	@Group(name = "ravengardPlusCrownBorder", min = 1, max = 1)
 	@Inject(
 			method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;III)V",
@@ -72,6 +89,7 @@ public class DrawContextMixin {
 			CallbackInfo callbackInfo
 	) {
 		ravengardPlus$drawUpgradeIndicator(stack, x, y);
+		ravengardPlus$drawCrownValue(stack, x, y);
 	}
 
 	@Group(name = "ravengardPlusUpgradeIndicator", min = 1, max = 1)
@@ -91,6 +109,7 @@ public class DrawContextMixin {
 			CallbackInfo callbackInfo
 	) {
 		ravengardPlus$drawUpgradeIndicator(stack, x, y);
+		ravengardPlus$drawCrownValue(stack, x, y);
 	}
 
 	@Unique
@@ -100,7 +119,7 @@ public class DrawContextMixin {
 			return;
 		}
 
-		double value = LoreValueParser.find(stack, "Crowns");
+		double value = LoreValueParser.find(stack, "Crown");
 		if (value < 0) {
 			return;
 		}
@@ -169,5 +188,100 @@ public class DrawContextMixin {
 		context.fill(x + 13, y, x + 15, y + 1, color);
 		context.fill(x + 12, y + 1, x + 16, y + 2, color);
 		context.fill(x + 13, y + 2, x + 15, y + 6, color);
+	}
+
+	@Unique
+	private void ravengardPlus$drawCrownValue(ItemStack stack, int x, int y) {
+		RavengardConfig config = RavengardConfig.HANDLER.instance();
+		if (!config.crownValueOverlayEnabled) {
+			return;
+		}
+
+		LoreValueParser.Display display = LoreValueParser.findDisplay(stack, "Crown");
+		if (display == null) {
+			return;
+		}
+
+		DrawContext context = (DrawContext) (Object) this;
+		TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+		int valueX = Math.round(x / ravengardPlus$CROWN_VALUE_SCALE);
+		int valueY = Math.round((y - 1) / ravengardPlus$CROWN_VALUE_SCALE);
+		Object matrices = ravengardPlus$getMatrices(context);
+		if (matrices instanceof Matrix3x2fStack pose) {
+			pose.pushMatrix();
+			pose.scale(ravengardPlus$CROWN_VALUE_SCALE, ravengardPlus$CROWN_VALUE_SCALE);
+			if (config.crownValueOverlayShowGlyph && !display.glyph().isEmpty()) {
+				context.drawText(textRenderer, display.glyph(), valueX, valueY, config.crownValueOverlayGlyphColor.getRGB(), true);
+				valueX += textRenderer.getWidth(display.glyph());
+			}
+			context.drawText(textRenderer, display.value(), valueX, valueY, config.crownValueOverlayColor.getRGB(), true);
+			pose.popMatrix();
+			return;
+		}
+
+		try {
+			ravengardPlus$pushMatrices.invoke(matrices);
+			ravengardPlus$scaleMatrices.invoke(
+					matrices,
+					ravengardPlus$CROWN_VALUE_SCALE,
+					ravengardPlus$CROWN_VALUE_SCALE,
+					1.0F
+			);
+			if (config.crownValueOverlayShowGlyph && !display.glyph().isEmpty()) {
+				context.drawText(textRenderer, display.glyph(), valueX, valueY, config.crownValueOverlayGlyphColor.getRGB(), true);
+				valueX += textRenderer.getWidth(display.glyph());
+			}
+			context.drawText(textRenderer, display.value(), valueX, valueY, config.crownValueOverlayColor.getRGB(), true);
+			ravengardPlus$popMatrices.invoke(matrices);
+		} catch (IllegalAccessException | InvocationTargetException exception) {
+			throw new IllegalStateException("Could not scale the crown value overlay", exception);
+		}
+	}
+
+	@Unique
+	private static Object ravengardPlus$getMatrices(DrawContext context) {
+		try {
+			if (ravengardPlus$getMatrices == null) {
+				var resolver = FabricLoader.getInstance().getMappingResolver();
+				String legacyGetter = resolver.mapMethodName(
+						"intermediary",
+						"net.minecraft.class_332",
+						"method_51448",
+						"()Lnet/minecraft/class_4587;"
+				);
+				String currentGetter = resolver.mapMethodName(
+						"intermediary",
+						"net.minecraft.class_332",
+						"method_51448",
+						"()Lorg/joml/Matrix3x2fStack;"
+				);
+				for (Method method : DrawContext.class.getMethods()) {
+					if (method.getParameterCount() == 0
+							&& (method.getName().equals(legacyGetter) || method.getName().equals(currentGetter))) {
+						ravengardPlus$getMatrices = method;
+						break;
+					}
+				}
+				if (ravengardPlus$getMatrices == null) {
+					throw new NoSuchMethodException("DrawContext matrix getter");
+				}
+
+				Class<?> matrixType = ravengardPlus$getMatrices.getReturnType();
+				if (!Matrix3x2fStack.class.isAssignableFrom(matrixType)) {
+					ravengardPlus$pushMatrices = matrixType.getMethod(resolver.mapMethodName(
+							"intermediary", "net.minecraft.class_4587", "method_22903", "()V"
+					));
+					ravengardPlus$scaleMatrices = matrixType.getMethod(resolver.mapMethodName(
+							"intermediary", "net.minecraft.class_4587", "method_22905", "(FFF)V"
+					), float.class, float.class, float.class);
+					ravengardPlus$popMatrices = matrixType.getMethod(resolver.mapMethodName(
+							"intermediary", "net.minecraft.class_4587", "method_22909", "()V"
+					));
+				}
+			}
+			return ravengardPlus$getMatrices.invoke(context);
+		} catch (ReflectiveOperationException exception) {
+			throw new IllegalStateException("Could not access the GUI matrix stack", exception);
+		}
 	}
 }

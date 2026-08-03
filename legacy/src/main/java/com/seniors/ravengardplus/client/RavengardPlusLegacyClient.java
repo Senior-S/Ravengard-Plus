@@ -1,12 +1,16 @@
 package com.seniors.ravengardplus.client;
 
+import com.seniors.ravengardplus.client.accessory.AccessoryUpgradeDetector;
+import com.seniors.ravengardplus.client.armor.ArmorUpgradeDetector;
 import com.seniors.ravengardplus.client.config.RavengardConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
@@ -23,6 +27,15 @@ public class RavengardPlusLegacyClient implements ClientModInitializer {
 
 		KeyBinding openConfig = KeyBindingHelper.registerKeyBinding(createOpenConfigKey());
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			Iterable<ItemStack> candidates = null;
+			if (client.player != null) {
+				candidates = client.currentScreen instanceof HandledScreen<?> screen
+						? screen.getScreenHandler().getStacks()
+						: client.player.getInventory().getMainStacks();
+			}
+			ArmorUpgradeDetector.update(client.player, candidates);
+			AccessoryUpgradeDetector.update(client.player, candidates);
+
 			while (openConfig.wasPressed()) {
 				client.setScreen(RavengardConfig.createScreen(client.currentScreen));
 			}

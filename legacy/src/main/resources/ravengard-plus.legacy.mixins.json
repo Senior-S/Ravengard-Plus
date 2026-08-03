@@ -3,7 +3,8 @@
 	"package": "com.seniors.ravengardplus.client.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"DrawContextMixin"
+		"DrawContextMixin",
+		"InventoryScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

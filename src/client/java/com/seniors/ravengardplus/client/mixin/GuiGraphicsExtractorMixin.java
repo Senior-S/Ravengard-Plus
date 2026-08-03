@@ -2,6 +2,8 @@ package com.seniors.ravengardplus.client.mixin;
 
 import com.seniors.ravengardplus.client.config.RavengardConfig;
 import com.seniors.ravengardplus.client.item.LoreValueParser;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +18,9 @@ import java.awt.Color;
 
 @Mixin(GuiGraphicsExtractor.class)
 public class GuiGraphicsExtractorMixin {
+	@Unique
+	private static final float ravengardPlus$CROWN_VALUE_SCALE = 0.6F;
+
 	@Inject(
 			method = "item(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V",
 			at = @At("HEAD")
@@ -34,7 +39,7 @@ public class GuiGraphicsExtractorMixin {
 			return;
 		}
 
-		double value = LoreValueParser.find(stack, "Crowns");
+		double value = LoreValueParser.find(stack, "Crown");
 		if (value < 0) {
 			return;
 		}
@@ -61,6 +66,43 @@ public class GuiGraphicsExtractorMixin {
 					color.getRGB()
 			);
 		}
+	}
+
+	@Inject(
+			method = "item(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V",
+			at = @At("TAIL")
+	)
+	private void ravengardPlus$drawCrownValue(
+			LivingEntity entity,
+			Level level,
+			ItemStack stack,
+			int x,
+			int y,
+			int seed,
+			CallbackInfo callbackInfo
+	) {
+		RavengardConfig config = RavengardConfig.HANDLER.instance();
+		if (!config.crownValueOverlayEnabled) {
+			return;
+		}
+
+		LoreValueParser.Display display = LoreValueParser.findDisplay(stack, "Crown");
+		if (display == null) {
+			return;
+		}
+
+		GuiGraphicsExtractor graphics = (GuiGraphicsExtractor) (Object) this;
+		Font font = Minecraft.getInstance().font;
+		int valueX = Math.round(x / ravengardPlus$CROWN_VALUE_SCALE);
+		int valueY = Math.round((y - 1) / ravengardPlus$CROWN_VALUE_SCALE);
+		graphics.pose().pushMatrix();
+		graphics.pose().scale(ravengardPlus$CROWN_VALUE_SCALE, ravengardPlus$CROWN_VALUE_SCALE);
+		if (config.crownValueOverlayShowGlyph && !display.glyph().isEmpty()) {
+			graphics.text(font, display.glyph(), valueX, valueY, config.crownValueOverlayGlyphColor.getRGB(), true);
+			valueX += font.width(display.glyph());
+		}
+		graphics.text(font, display.value(), valueX, valueY, config.crownValueOverlayColor.getRGB(), true);
+		graphics.pose().popMatrix();
 	}
 
 	@Unique

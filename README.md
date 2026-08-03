@@ -22,13 +22,17 @@ Items with a Crown value in their lore receive a configurable color indicator. T
 
 Soft slot tint is the default style. Pixel corners, a bottom stripe, side markers, and a full outline are also available. You can add or remove tiers and choose a color and maximum Crown value for each one.
 
+An optional Crown-value overlay can show the lore glyph and number in the upper-left corner of each item. The overlay is disabled by default, with separate glyph and number colors and an option to hide the glyph.
+
+The player inventory screen shows the combined Crown value of carried and equipped items below the ability slots. Stack values are multiplied by item count, and container contents are excluded.
+
 ### Armor upgrades
 
-An arrow marks armor with more Defense than the item currently equipped in the same slot. Armor models the current class cannot equip get skipped. The indicator has its own toggle and color setting.
+An arrow marks the best armor upgrade for each equipment slot. Armor models the current class cannot equip get skipped. The indicator has its own toggle and color setting.
 
 ### Accessory upgrades
 
-Necklaces, earrings, belts, and rings are compared with the matching accessory. An arrow appears when a candidate preserves every current buff and improves at least one value. Extra positive buffs count as an improvement. Accessory indicators have a separate toggle and color.
+Necklaces, earrings, belts, and rings are compared with the matching accessory. One arrow marks the strongest candidate that preserves every current buff and improves at least one value. Extra positive buffs count as an improvement. Accessory indicators have a separate toggle and color.
 
 ## Configuration
 

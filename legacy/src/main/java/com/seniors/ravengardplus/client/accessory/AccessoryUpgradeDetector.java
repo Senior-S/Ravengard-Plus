@@ -1,59 +1,104 @@
 package com.seniors.ravengardplus.client.accessory;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class AccessoryUpgradeDetector {
 	private static final String MODEL_NAMESPACE = "hypixel_ravengard";
 	private static final String MODEL_PREFIX = "item/accessories/";
+	private static final ItemStack[] BEST_UPGRADES = new ItemStack[4];
+	private static final double[] BEST_IMPROVEMENTS = new double[4];
 
 	private AccessoryUpgradeDetector() {
 	}
 
-	public static boolean isUpgrade(ItemStack candidate) {
-		int slot = accessorySlot(candidate);
-		if (slot < 0) {
-			return false;
-		}
-
-		ClientPlayerEntity player = MinecraftClient.getInstance().player;
+	public static void update(ClientPlayerEntity player, Iterable<ItemStack> candidates) {
+		Arrays.fill(BEST_UPGRADES, null);
+		Arrays.fill(BEST_IMPROVEMENTS, Double.NEGATIVE_INFINITY);
 		if (player == null) {
-			return false;
+			return;
 		}
 
-		ItemStack equipped = player.getInventory().getStack(slot);
-		Map<String, Double> candidateBuffs = buffs(candidate);
-		Map<String, Double> equippedBuffs = accessorySlot(equipped) == slot ? buffs(equipped) : Map.of();
-		if (candidateBuffs.isEmpty()) {
-			return false;
-		}
+		PlayerInventory inventory = player.getInventory();
+		Map<String, Double> neckBuffs = equippedBuffs(inventory, 9);
+		Map<String, Double> earringsBuffs = equippedBuffs(inventory, 10);
+		Map<String, Double> beltBuffs = equippedBuffs(inventory, 11);
+		Map<String, Double> ringBuffs = equippedBuffs(inventory, 12);
 
-		boolean improved = false;
-		for (Map.Entry<String, Double> buff : candidateBuffs.entrySet()) {
-			double equippedValue = equippedBuffs.getOrDefault(buff.getKey(), 0.0);
-			if (buff.getValue() < equippedValue) {
-				return false;
+		for (ItemStack candidate : candidates) {
+			int slot = accessorySlot(candidate);
+			if (slot < 0) {
+				continue;
 			}
-			improved |= buff.getValue() > equippedValue;
-		}
 
-		for (Map.Entry<String, Double> buff : equippedBuffs.entrySet()) {
-			double candidateValue = candidateBuffs.getOrDefault(buff.getKey(), 0.0);
-			if (candidateValue < buff.getValue()) {
-				return false;
+			Map<String, Double> candidateBuffs = buffs(candidate);
+			if (candidateBuffs.isEmpty()) {
+				continue;
 			}
-			improved |= candidateValue > buff.getValue();
-		}
 
-		return improved;
+			int type = slot - 9;
+			Map<String, Double> currentBuffs = switch (type) {
+				case 0 -> neckBuffs;
+				case 1 -> earringsBuffs;
+				case 2 -> beltBuffs;
+				default -> ringBuffs;
+			};
+			double improvement = 0;
+			boolean valid = true;
+
+			for (Map.Entry<String, Double> buff : currentBuffs.entrySet()) {
+				double candidateValue = candidateBuffs.getOrDefault(buff.getKey(), 0.0);
+				if (candidateValue < buff.getValue()) {
+					valid = false;
+					break;
+				}
+				if (!candidateBuffs.containsKey(buff.getKey()) && candidateValue > buff.getValue()) {
+					improvement += candidateValue - buff.getValue();
+				}
+			}
+			if (!valid) {
+				continue;
+			}
+
+			for (Map.Entry<String, Double> buff : candidateBuffs.entrySet()) {
+				double currentValue = currentBuffs.getOrDefault(buff.getKey(), 0.0);
+				if (buff.getValue() < currentValue) {
+					valid = false;
+					break;
+				}
+				if (buff.getValue() > currentValue) {
+					improvement += buff.getValue() - currentValue;
+				}
+			}
+
+			if (valid && improvement > 0 && improvement > BEST_IMPROVEMENTS[type]) {
+				BEST_UPGRADES[type] = candidate;
+				BEST_IMPROVEMENTS[type] = improvement;
+			}
+		}
+	}
+
+	public static boolean isUpgrade(ItemStack candidate) {
+		for (ItemStack bestUpgrade : BEST_UPGRADES) {
+			if (candidate == bestUpgrade) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static Map<String, Double> equippedBuffs(PlayerInventory inventory, int slot) {
+		ItemStack equipped = inventory.getStack(slot);
+		return accessorySlot(equipped) == slot ? buffs(equipped) : Map.of();
 	}
 
 	private static int accessorySlot(ItemStack stack) {
@@ -63,6 +108,9 @@ public final class AccessoryUpgradeDetector {
 		}
 
 		String path = itemModel.getPath();
+		if (path.endsWith("_greyed")) {
+			return -1;
+		}
 		if (path.startsWith(MODEL_PREFIX + "neck")) {
 			return 9;
 		}
@@ -150,7 +198,7 @@ public final class AccessoryUpgradeDetector {
 			}
 
 			String name = text.substring(index).stripTrailing();
-			if (!name.equals("Crowns")) {
+			if (!name.equals("Crown") && !name.equals("Crowns")) {
 				buffs.put(name, negative ? -value : value);
 			}
 		}
