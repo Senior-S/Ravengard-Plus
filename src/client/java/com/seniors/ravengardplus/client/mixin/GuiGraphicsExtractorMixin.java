@@ -2,6 +2,7 @@ package com.seniors.ravengardplus.client.mixin;
 
 import com.seniors.ravengardplus.client.config.RavengardConfig;
 import com.seniors.ravengardplus.client.item.LoreValueParser;
+import com.seniors.ravengardplus.client.item.CrownReplacementDetector;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -82,6 +83,14 @@ public class GuiGraphicsExtractorMixin {
 			CallbackInfo callbackInfo
 	) {
 		RavengardConfig config = RavengardConfig.HANDLER.instance();
+		GuiGraphicsExtractor graphics = (GuiGraphicsExtractor) (Object) this;
+		if (config.crownReplacementEnabled) {
+			if (CrownReplacementDetector.isCheapest(stack)) {
+				graphics.fill(x, y, x + 16, y + 16, 0x66FFFFFF);
+			} else if (CrownReplacementDetector.isRejectedContainerItem(stack)) {
+				graphics.fill(x, y, x + 16, y + 16, 0x70C0C0C0);
+			}
+		}
 		if (!config.crownValueOverlayEnabled) {
 			return;
 		}
@@ -91,7 +100,6 @@ public class GuiGraphicsExtractorMixin {
 			return;
 		}
 
-		GuiGraphicsExtractor graphics = (GuiGraphicsExtractor) (Object) this;
 		Font font = Minecraft.getInstance().font;
 		int valueX = Math.round(x / ravengardPlus$CROWN_VALUE_SCALE);
 		int valueY = Math.round((y - 1) / ravengardPlus$CROWN_VALUE_SCALE);

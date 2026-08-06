@@ -3,6 +3,12 @@
 /build/
 /legacy/.gradle/
 /legacy/build/
+/legacy-1.21.11/.gradle/
+/legacy-1.21.11/build/
+/legacy-1.21.9/.gradle/
+/legacy-1.21.9/build/
+/modern-26.1/.gradle/
+/modern-26.1/build/
 /out/
 /classes/
 /bin/
@@ -18,9 +24,12 @@
 .classpath
 .project
 
-# Fabric development runtime
+# Development runtime
 /run/
 /legacy/run/
+/legacy-1.21.11/run/
+/legacy-1.21.9/run/
+/modern-26.1/run/
 /logs/
 /crash-reports/
 /saves/

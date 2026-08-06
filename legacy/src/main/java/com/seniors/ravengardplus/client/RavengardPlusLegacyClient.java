@@ -1,11 +1,14 @@
 package com.seniors.ravengardplus.client;
 
 import com.seniors.ravengardplus.client.accessory.AccessoryUpgradeDetector;
+import com.seniors.ravengardplus.client.ability.AbilityCooldownTracker;
 import com.seniors.ravengardplus.client.armor.ArmorUpgradeDetector;
 import com.seniors.ravengardplus.client.config.RavengardConfig;
+import com.seniors.ravengardplus.client.item.CrownReplacementDetector;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.option.KeyBinding;
@@ -26,15 +29,24 @@ public class RavengardPlusLegacyClient implements ClientModInitializer {
 		RavengardConfig.HANDLER.load();
 
 		KeyBinding openConfig = KeyBindingHelper.registerKeyBinding(createOpenConfigKey());
+		ClientReceiveMessageEvents.GAME.register((message, overlay) -> AbilityCooldownTracker.onGameMessage(message.getString()));
+		ClientTickEvents.START_CLIENT_TICK.register(AbilityCooldownTracker::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			Iterable<ItemStack> candidates = null;
+			HandledScreen<?> containerScreen = null;
 			if (client.player != null) {
-				candidates = client.currentScreen instanceof HandledScreen<?> screen
-						? screen.getScreenHandler().getStacks()
+				containerScreen = client.currentScreen instanceof HandledScreen<?> screen ? screen : null;
+				candidates = containerScreen != null
+						? containerScreen.getScreenHandler().getStacks()
 						: client.player.getInventory().getMainStacks();
 			}
 			ArmorUpgradeDetector.update(client.player, candidates);
 			AccessoryUpgradeDetector.update(client.player, candidates);
+			CrownReplacementDetector.update(
+					client.player,
+					containerScreen == null ? null : containerScreen.getScreenHandler(),
+					RavengardConfig.HANDLER.instance().crownReplacementEnabled
+			);
 
 			while (openConfig.wasPressed()) {
 				client.setScreen(RavengardConfig.createScreen(client.currentScreen));

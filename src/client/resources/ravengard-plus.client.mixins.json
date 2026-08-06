@@ -5,7 +5,11 @@
 	"client": [
 		"UpgradeIndicatorMixin",
 		"GuiGraphicsExtractorMixin",
-		"InventoryScreenMixin"
+		"InventoryScreenMixin",
+		"HudMixin",
+		"DebugScreenEntryListMixin",
+		"DebugRendererMixin",
+		"EntityHitboxDebugRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

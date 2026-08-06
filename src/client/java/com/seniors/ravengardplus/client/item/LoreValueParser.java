@@ -5,7 +5,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public final class LoreValueParser {
+	private static final Pattern DURATION_PART = Pattern.compile("(\\d+(?:[.,]\\d+)?)\\s*([sm])", Pattern.CASE_INSENSITIVE);
+	private static final Pattern EFFECT_DURATION = Pattern.compile("\\bfor\\s+(\\d+(?:[.,]\\d+)?)\\s+seconds\\b", Pattern.CASE_INSENSITIVE);
+
 	private LoreValueParser() {
 	}
 
@@ -72,6 +78,51 @@ public final class LoreValueParser {
 
 			if (valid && foundDigit) {
 				return value;
+			}
+		}
+
+		return -1;
+	}
+
+	public static double findDuration(ItemStack stack, String label) {
+		ItemLore lore = stack.get(DataComponents.LORE);
+		if (lore == null) {
+			return -1;
+		}
+
+		for (Component line : lore.lines()) {
+			String text = line.getString();
+			int labelStart = text.lastIndexOf(label);
+			if (labelStart < 0) {
+				continue;
+			}
+
+			Matcher matcher = DURATION_PART.matcher(text.substring(labelStart + label.length()));
+			double seconds = 0;
+			boolean found = false;
+			while (matcher.find()) {
+				double value = Double.parseDouble(matcher.group(1).replace(',', '.'));
+				seconds += Character.toLowerCase(matcher.group(2).charAt(0)) == 'm' ? value * 60 : value;
+				found = true;
+			}
+			if (found) {
+				return seconds;
+			}
+		}
+
+		return -1;
+	}
+
+	public static double findEffectDuration(ItemStack stack) {
+		ItemLore lore = stack.get(DataComponents.LORE);
+		if (lore == null) {
+			return -1;
+		}
+
+		for (Component line : lore.lines()) {
+			Matcher matcher = EFFECT_DURATION.matcher(line.getString());
+			if (matcher.find()) {
+				return Double.parseDouble(matcher.group(1).replace(',', '.'));
 			}
 		}
 
