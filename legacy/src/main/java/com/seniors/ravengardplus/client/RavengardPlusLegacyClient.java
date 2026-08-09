@@ -5,6 +5,7 @@ import com.seniors.ravengardplus.client.ability.AbilityCooldownTracker;
 import com.seniors.ravengardplus.client.armor.ArmorUpgradeDetector;
 import com.seniors.ravengardplus.client.config.RavengardConfig;
 import com.seniors.ravengardplus.client.item.CrownReplacementDetector;
+import com.seniors.ravengardplus.client.utils.ScoreboardUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -27,6 +28,7 @@ public class RavengardPlusLegacyClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		RavengardConfig.HANDLER.load();
+		ScoreboardUtils.init();
 
 		KeyBinding openConfig = KeyBindingHelper.registerKeyBinding(createOpenConfigKey());
 		ClientReceiveMessageEvents.GAME.register((message, overlay) -> AbilityCooldownTracker.onGameMessage(message.getString()));
