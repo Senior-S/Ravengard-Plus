@@ -3,6 +3,7 @@ package com.seniors.ravengardplus.client.config;
 import com.seniors.ravengardplus.client.ScreenCompat;
 import com.seniors.ravengardplus.client.RavengardPlusClient;
 import com.seniors.ravengardplus.client.ability.AbilityCooldownTracker;
+import com.seniors.ravengardplus.client.utils.RavengardUtils;
 import dev.isxander.yacl3.api.ButtonOption;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.NameableEnum;
@@ -27,8 +28,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 
 import java.awt.Color;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class RavengardConfig {
 	private static final Color DEFAULT_MEDIUM_COLOR = new Color(0x55FF55);
@@ -39,7 +43,30 @@ public class RavengardConfig {
 	private static final Color DEFAULT_PLAYER_HITBOX_COLOR = new Color(0xFF0000);
 	private static final String DEFAULT_ABILITY_SOUND = "minecraft:block.note_block.pling";
 
-	public static final ConfigClassHandler<RavengardConfig> HANDLER = ConfigClassHandler
+	// list of all config that the ravengard detection can disable when outside 
+	// (avoid the feature interacting with all @SerialEntry, like colorpickers, etc...)
+	private static final Set<String> FEATURE_TOGGLE_FIELDS = Set.of(
+			"crownBordersEnabled",
+			"crownValueOverlayEnabled",
+			"inventoryTotalEnabled",
+			"crownReplacementEnabled",
+			"armorUpgradeIndicatorEnabled",
+			"accessoryUpgradeIndicatorEnabled",
+			"abilityCooldownEnabled",
+			"abilityCooldownSoundEnabled",
+			"alwaysShowHitboxes",
+			"hideArmorStandHitboxes"
+	);
+
+	// whitelist to allow features outside ravengard.
+	private static final Set<String> ALLOWED_OUTSIDE_RAVENGARD = Set.of();
+
+	private static final List<Field> SERIAL_FIELDS = Arrays.stream(RavengardConfig.class.getDeclaredFields())
+			.filter(field -> field.isAnnotationPresent(SerialEntry.class))
+			.peek(field -> field.setAccessible(true))
+			.toList();
+
+	private static final ConfigClassHandler<RavengardConfig> RAW_HANDLER = ConfigClassHandler
 			.createBuilder(RavengardConfig.class)
 			.id(RavengardPlusClient.id("config"))
 			.serializer(config -> GsonConfigSerializerBuilder.create(config)
@@ -47,6 +74,8 @@ public class RavengardConfig {
 					.setJson5(true)
 					.build())
 			.build();
+
+	public static final HandlerFacade HANDLER = new HandlerFacade();
 
 	@SerialEntry
 	public boolean crownBordersEnabled = true;
@@ -118,8 +147,39 @@ public class RavengardConfig {
 			new CrownTier(-1, DEFAULT_HIGH_COLOR)
 	));
 
+	private static RavengardConfig buildOutsideRavengardView(RavengardConfig real) {
+		RavengardConfig view = new RavengardConfig();
+		for (Field field : SERIAL_FIELDS) {
+			try {
+				Object value = field.get(real);
+				if (FEATURE_TOGGLE_FIELDS.contains(field.getName()) && !ALLOWED_OUTSIDE_RAVENGARD.contains(field.getName())) {
+					value = false;
+				}
+				field.set(view, value);
+			} catch (IllegalAccessException exception) {
+				throw new IllegalStateException("Failed to build outside-Ravengard config view", exception);
+			}
+		}
+		return view;
+	}
+
+	public static final class HandlerFacade {
+		public RavengardConfig instance() {
+			RavengardConfig real = RAW_HANDLER.instance();
+			return RavengardUtils.isInRavengard() ? real : buildOutsideRavengardView(real);
+		}
+
+		public void load() {
+			RAW_HANDLER.load();
+		}
+
+		public void save() {
+			RAW_HANDLER.save();
+		}
+	}
+
 	public static Screen createScreen(Screen parent) {
-		RavengardConfig config = HANDLER.instance();
+		RavengardConfig config = RAW_HANDLER.instance();
 		Option<String> abilitySoundOption = Option.<String>createBuilder()
 				.name(Component.translatable("ravengard-plus.config.ability_cooldown_sound"))
 				.description(OptionDescription.of(Component.translatable("ravengard-plus.config.ability_cooldown_sound.description")))
