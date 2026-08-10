@@ -8,6 +8,52 @@ permissions:
   contents: read
 
 jobs:
+  neoforge:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: neoforge-1.21.5
+            java: '21'
+            artifact: ravengard-plus-neoforge-mc1.21.5
+          - project: neoforge-1.21.6
+            java: '21'
+            artifact: ravengard-plus-neoforge-mc1.21.6-1.21.8
+          - project: neoforge-1.21.9
+            java: '21'
+            artifact: ravengard-plus-neoforge-mc1.21.9-1.21.10
+          - project: neoforge-1.21.11
+            java: '21'
+            artifact: ravengard-plus-neoforge-mc1.21.11
+          - project: neoforge-26.1
+            java: '25'
+            artifact: ravengard-plus-neoforge-mc26.1-26.1.2
+          - project: neoforge
+            java: '25'
+            artifact: ravengard-plus-neoforge-mc26.2
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+      - name: setup jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'microsoft'
+      - name: make gradle wrapper executable
+        run: chmod +x ./${{ matrix.project }}/gradlew
+      - name: build
+        run: ./${{ matrix.project }}/gradlew -p ${{ matrix.project }} build
+      - name: capture build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            ${{ matrix.project }}/build/libs/ravengard-plus-*.jar
+            !${{ matrix.project }}/build/libs/*-sources.jar
+
   modern-26-1:
     runs-on: ubuntu-24.04
     steps:
@@ -130,7 +176,7 @@ jobs:
 
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [modern-26-1, modern, legacy, legacy-1-21-9, legacy-1-21-11]
+    needs: [neoforge, modern-26-1, modern, legacy, legacy-1-21-9, legacy-1-21-11]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -152,6 +198,9 @@ jobs:
           legacy_1_21_9_version="$(sed -n 's/^mod_version=//p' legacy-1.21.9/gradle.properties)"
           legacy_1_21_11_version="$(sed -n 's/^mod_version=//p' legacy-1.21.11/gradle.properties)"
           test -n "$version"
+          for project in neoforge neoforge-26.1 neoforge-1.21.5 neoforge-1.21.6 neoforge-1.21.9 neoforge-1.21.11; do
+            test "$version" = "$(sed -n 's/^mod_version=//p' "$project/gradle.properties")"
+          done
           test "$version" = "$modern_26_1_version"
           test "$version" = "$legacy_version"
           test "$version" = "$legacy_1_21_9_version"

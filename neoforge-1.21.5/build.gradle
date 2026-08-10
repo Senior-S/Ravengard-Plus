@@ -1,0 +1,79 @@
+plugins {
+	id 'java-library'
+	id 'maven-publish'
+	id 'net.neoforged.gradle.userdev' version '7.1.38'
+}
+
+version = "${mod_version}+mc1.21.5-neoforge"
+group = mod_group_id
+
+base {
+	archivesName = 'ravengard-plus'
+}
+
+repositories {
+	maven {
+		name = 'Xander Maven'
+		url = 'https://maven.isxander.dev/releases'
+	}
+}
+
+java {
+	toolchain.languageVersion = JavaLanguageVersion.of(21)
+	withSourcesJar()
+}
+
+runs {
+	configureEach {
+		workingDirectory project.layout.projectDirectory.dir('run').dir(name)
+		modSource project.sourceSets.main
+	}
+
+	client {}
+}
+
+dependencies {
+	implementation "net.neoforged:neoforge:${neo_version}"
+	implementation "dev.isxander:yet-another-config-lib:${yacl_version}"
+}
+
+tasks.withType(ProcessResources).configureEach {
+	def replaceProperties = [
+			minecraft_version: minecraft_version,
+			minecraft_version_range: minecraft_version_range,
+			neo_version: neo_version,
+			neo_version_range: neo_version_range,
+			mod_id: mod_id,
+			mod_name: mod_name,
+			mod_license: mod_license,
+			mod_version: project.version,
+			yacl_version_range: yacl_version_range,
+	]
+	inputs.properties replaceProperties
+
+	filesMatching('META-INF/neoforge.mods.toml') {
+		expand replaceProperties
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+}
+
+def projectName = project.name
+
+jar {
+	inputs.property 'projectName', projectName
+
+	from('../LICENSE') {
+		rename { "${it}_${projectName}" }
+	}
+}
+
+publishing {
+	publications {
+		register('mavenJava', MavenPublication) {
+			from components.java
+		}
+	}
+}

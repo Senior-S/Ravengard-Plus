@@ -5,7 +5,7 @@
 <h1 align="center">Ravengard Plus</h1>
 
 <p align="center">
-  Client-side item utilities for Hypixel Ravengard on Minecraft 1.21.5-1.21.11 and 26.1-26.2, with Fabric builds.
+  Client-side item utilities for Hypixel Ravengard on Minecraft 1.21.5-1.21.11 and 26.1-26.2, with Fabric and NeoForge builds.
 </p>
 
 <p align="center">
@@ -75,12 +75,40 @@ The menu is powered by [YetAnotherConfigLib](https://modrinth.com/mod/yacl) and 
 
 All versions require Fabric Loader 0.19.3 or newer.
 
+### NeoForge
+
+1. Install NeoForge for your Minecraft version.
+2. Add the matching NeoForge build of YetAnotherConfigLib to the `mods` folder.
+3. Add the matching Ravengard Plus jar to the same folder.
+
+| Minecraft | Ravengard Plus jar | Java | YACL |
+| --- | --- | --- | --- |
+| 1.21.5 | `+mc1.21.5-neoforge` | 21 or newer | 3.8.1 for Minecraft 1.21.5 |
+| 1.21.6-1.21.8 | `+mc1.21.6-1.21.8-neoforge` | 21 or newer | 3.8.1 or newer for your Minecraft version |
+| 1.21.9-1.21.10 | `+mc1.21.9-1.21.10-neoforge` | 21 or newer | 3.8.0 or newer for your Minecraft version |
+| 1.21.11 | `+mc1.21.11-neoforge` | 21 or newer | 3.8.1 or newer for Minecraft 1.21.11 |
+| 26.1-26.1.2 | `+mc26.1-26.1.2-neoforge` | 25 or newer | 3.9.6 or newer for Minecraft 26.1 |
+| 26.2 | `+mc26.2-neoforge` | 25 or newer | 3.9.5 or newer for Minecraft 26.2 |
+
+The NeoForge Mods screen and the `O` key both open the YACL configuration screen.
+
 ## Building from source
 
 Build the Minecraft 26.2 jar with Java 25:
 
 ```shell
 ./gradlew build
+```
+
+Build the NeoForge jars from the repository root. Use Java 21 for the 1.21.x projects and Java 25 for the 26.x projects:
+
+```shell
+./neoforge-1.21.5/gradlew -p neoforge-1.21.5 build
+./neoforge-1.21.6/gradlew -p neoforge-1.21.6 build
+./neoforge-1.21.9/gradlew -p neoforge-1.21.9 build
+./neoforge-1.21.11/gradlew -p neoforge-1.21.11 build
+./neoforge-26.1/gradlew -p neoforge-26.1 build
+./neoforge/gradlew -p neoforge build
 ```
 
 Build the Minecraft 26.1-26.1.2 jar with Java 25:
