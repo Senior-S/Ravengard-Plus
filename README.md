@@ -45,7 +45,7 @@ Necklaces, earrings, belts, and rings are compared with the matching accessory. 
 
 ### Ability cooldowns
 
-The two abilities in the player crafting grid receive on-screen cooldown timers beside the hotbar. The left side tracks a drop-key attempt while an item is held, and the right side tracks a swap-hand-key attempt. A timer starts after the game confirms the ability use in chat, so blocked attempts are ignored. Abilities described as lasting `for X seconds` begin their cooldown after that effect ends. Cooldown lore supports decimal seconds, minutes, and combined values such as `1m 44s`. Timer color and text scale are configurable, with scale limited to 50-150%. An optional expiry sound can be selected from Minecraft's registered sound events and previewed from the configuration screen.
+The two abilities in the player crafting grid receive on-screen cooldown timers beside the hotbar. The left side tracks a drop-key attempt while an item is held, and the right side tracks a swap-hand-key attempt. A timer starts after the game confirms the ability use in chat, so blocked attempts are ignored. Abilities described as lasting `for X seconds` begin their cooldown after that effect ends. Cooldown lore supports decimal seconds, minutes, and combined values such as `1m 44s`. Timer color and text scale are configurable, with scale limited to 50-150%. The expiry sound is enabled by default, can use any registered Minecraft sound event, and can be previewed from the configuration screen.
 
 ### Hitboxes
 
