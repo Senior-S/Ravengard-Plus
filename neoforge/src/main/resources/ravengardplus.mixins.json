@@ -3,6 +3,7 @@
 	"package": "com.seniors.ravengardplus.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"EntityFullBrightMixin",
 		"UpgradeIndicatorMixin",
 		"GuiGraphicsExtractorMixin",
 		"InventoryScreenMixin",

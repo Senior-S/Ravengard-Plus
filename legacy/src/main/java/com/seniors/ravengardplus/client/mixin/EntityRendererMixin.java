@@ -5,6 +5,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.state.EntityHitboxAndView;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,13 +19,16 @@ import java.awt.Color;
 @Mixin(EntityRenderer.class)
 public class EntityRendererMixin {
 	@Inject(method = "createHitbox", at = @At("HEAD"), cancellable = true)
-	private void ravengardPlus$hideArmorStandHitboxes(
+	private void ravengardPlus$hideUnnecessaryHitboxes(
 			Entity entity,
 			float tickDelta,
 			boolean serverEntity,
 			CallbackInfoReturnable<EntityHitboxAndView> callbackInfo
 	) {
-		if (RavengardConfig.HANDLER.instance().hideArmorStandHitboxes && entity instanceof ArmorStandEntity) {
+		if (RavengardConfig.HANDLER.instance().hideArmorStandHitboxes
+				&& (entity instanceof ArmorStandEntity
+						|| entity instanceof DisplayEntity.ItemDisplayEntity
+						|| entity instanceof DisplayEntity.TextDisplayEntity)) {
 			callbackInfo.setReturnValue(null);
 		}
 	}

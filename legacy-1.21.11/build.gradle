@@ -35,8 +35,8 @@ processResources {
 		expand 'version': version
 	}
 
-	from('../src/client/resources/assets') {
-		into 'assets'
+	from('../translations') {
+		into 'assets/ravengard-plus/lang'
 	}
 	from('../icon.png') {
 		into 'assets/ravengard-plus'

@@ -55,7 +55,7 @@ public class RavengardConfig {
 	public BorderStyle crownBorderStyle = BorderStyle.SOFT_TINT;
 
 	@SerialEntry
-	public boolean crownValueOverlayEnabled = false;
+	public boolean crownValueOverlayEnabled = true;
 
 	@SerialEntry
 	public boolean crownValueOverlayShowGlyph = true;
@@ -98,6 +98,9 @@ public class RavengardConfig {
 
 	@SerialEntry
 	public String abilityCooldownSound = DEFAULT_ABILITY_SOUND;
+
+	@SerialEntry
+	public boolean entityFullBrightEnabled = true;
 
 	@SerialEntry
 	public boolean alwaysShowHitboxes = false;
@@ -146,7 +149,7 @@ public class RavengardConfig {
 						.option(Option.<Boolean>createBuilder()
 								.name(Component.translatable("ravengard-plus.config.crown_value_overlay"))
 								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.crown_value_overlay.description")))
-								.binding(false, () -> config.crownValueOverlayEnabled, value -> config.crownValueOverlayEnabled = value)
+								.binding(true, () -> config.crownValueOverlayEnabled, value -> config.crownValueOverlayEnabled = value)
 								.controller(BooleanControllerBuilder::create)
 								.build())
 						.option(Option.<Boolean>createBuilder()
@@ -241,6 +244,7 @@ public class RavengardConfig {
 						.build())
 				.category(ConfigCategory.createBuilder()
 						.name(Component.translatable("ravengard-plus.config.accessory_upgrades"))
+						.tooltip(Component.translatable("ravengard-plus.config.accessory_upgrades.description"))
 						.option(Option.<Boolean>createBuilder()
 								.name(Component.translatable("ravengard-plus.config.accessory_upgrade_indicator"))
 								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.accessory_upgrade_indicator.description")))
@@ -255,6 +259,7 @@ public class RavengardConfig {
 						.build())
 				.category(ConfigCategory.createBuilder()
 						.name(Component.translatable("ravengard-plus.config.ability_cooldowns"))
+						.tooltip(Component.translatable("ravengard-plus.config.ability_cooldowns.description"))
 						.option(Option.<Boolean>createBuilder()
 								.name(Component.translatable("ravengard-plus.config.ability_cooldown_enabled"))
 								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.ability_cooldown_enabled.description")))
@@ -286,7 +291,18 @@ public class RavengardConfig {
 								.build())
 						.build())
 				.category(ConfigCategory.createBuilder()
+						.name(Component.translatable("ravengard-plus.config.entity_visibility"))
+						.tooltip(Component.translatable("ravengard-plus.config.entity_visibility.description"))
+						.option(Option.<Boolean>createBuilder()
+								.name(Component.translatable("ravengard-plus.config.entity_full_bright"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.entity_full_bright.description")))
+								.binding(true, () -> config.entityFullBrightEnabled, value -> config.entityFullBrightEnabled = value)
+								.controller(BooleanControllerBuilder::create)
+								.build())
+						.build())
+				.category(ConfigCategory.createBuilder()
 						.name(Component.translatable("ravengard-plus.config.hitboxes"))
+						.tooltip(Component.translatable("ravengard-plus.config.hitboxes.description"))
 						.option(Option.<Boolean>createBuilder()
 								.name(Component.translatable("ravengard-plus.config.always_show_hitboxes"))
 								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.always_show_hitboxes.description")))

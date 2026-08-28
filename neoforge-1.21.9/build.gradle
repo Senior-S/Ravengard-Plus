@@ -51,6 +51,10 @@ tasks.withType(ProcessResources).configureEach {
 	]
 	inputs.properties replaceProperties
 
+	from('../translations') {
+		into 'assets/ravengard-plus/lang'
+	}
+
 	filesMatching('META-INF/neoforge.mods.toml') {
 		expand replaceProperties
 	}

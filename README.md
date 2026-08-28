@@ -31,7 +31,7 @@ Soft slot tint is the default style. Pixel corners, a bottom stripe, side marker
 
 When every usable inventory slot is occupied, opening a container compares its Crown-valued items with the cheapest replaceable item you carry. A bright tint marks the inventory item to replace whenever the container offers something more valuable. Container items worth the same or less receive a light-gray tint. Accessory slots and the final hotbar slot remain reserved and do not count toward inventory fullness.
 
-An optional Crown-value overlay can show the lore glyph and number in the upper-left corner of each item. The overlay is disabled by default, with separate glyph and number colors and an option to hide the glyph.
+An optional Crown-value overlay shows the lore glyph and number in the upper-left corner of each item by default, with separate glyph and number colors and an option to hide the glyph.
 
 The player inventory screen shows the combined Crown value of carried and equipped items below the ability slots. Stack values are multiplied by item count, and container contents are excluded.
 
@@ -49,13 +49,21 @@ The two abilities in the player crafting grid receive on-screen cooldown timers 
 
 ### Hitboxes
 
-Hitboxes can remain visible without Minecraft's debug shortcut. Player and mob outlines use separate configurable colors, with bright red players and white mobs by default. Armor stand hitboxes are hidden by default. Always-on hitboxes remain disabled until enabled in the configuration screen.
+Hitboxes can remain visible without Minecraft's debug shortcut. Player and mob outlines use separate configurable colors, with bright red players and white mobs by default. Armor stand, item display, and text display hitboxes are hidden by default. Always-on hitboxes remain disabled until enabled in the configuration screen.
+
+### Entity full bright
+
+Every entity renders at maximum brightness by default while world lighting stays unchanged. This includes hostile and passive mobs, players, dropped items, projectiles, and display entities.
 
 ## Configuration
 
 Press `O` in game to open the configuration screen. You can rebind this key under Minecraft's Controls settings.
 
 The menu is powered by [YetAnotherConfigLib](https://modrinth.com/mod/yacl) and covers Crown tiers, indicator styles, feature toggles, and colors.
+
+## Translations
+
+Locale files live in the root `translations` directory and are included in every Fabric and NeoForge jar. Add a locale such as `es_es.json` or `ru_ru.json` there, using `en_us.json` as the complete key reference.
 
 ## Installation
 

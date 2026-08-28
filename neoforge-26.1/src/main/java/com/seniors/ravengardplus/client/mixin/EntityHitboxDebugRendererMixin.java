@@ -1,8 +1,11 @@
 package com.seniors.ravengardplus.client.mixin;
 
+import com.google.common.collect.Iterables;
 import com.seniors.ravengardplus.client.config.RavengardConfig;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.debug.EntityHitboxDebugRenderer;
 import net.minecraft.gizmos.GizmoStyle;
+import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
@@ -14,14 +17,36 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityHitboxDebugRenderer.class)
 public class EntityHitboxDebugRendererMixin {
+	@Redirect(
+			method = "emitGizmos",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/client/multiplayer/ClientLevel;entitiesForRendering()Ljava/lang/Iterable;"
+			)
+	)
+	private Iterable<Entity> ravengardPlus$filterUnnecessaryHitboxes(ClientLevel level) {
+		Iterable<Entity> entities = level.entitiesForRendering();
+		if (!RavengardConfig.HANDLER.instance().hideArmorStandHitboxes) {
+			return entities;
+		}
+
+		return Iterables.filter(entities,
+				entity -> !(entity instanceof ArmorStand
+						|| entity instanceof Display.ItemDisplay
+						|| entity instanceof Display.TextDisplay));
+	}
+
 	@Inject(method = "showHitboxes", at = @At("HEAD"), cancellable = true)
-	private void ravengardPlus$hideArmorStandHitboxes(
+	private void ravengardPlus$hideUnnecessaryHitboxes(
 			Entity entity,
 			float partialTick,
 			boolean serverEntity,
 			CallbackInfo callbackInfo
 	) {
-		if (RavengardConfig.HANDLER.instance().hideArmorStandHitboxes && entity instanceof ArmorStand) {
+		if (RavengardConfig.HANDLER.instance().hideArmorStandHitboxes
+				&& (entity instanceof ArmorStand
+						|| entity instanceof Display.ItemDisplay
+						|| entity instanceof Display.TextDisplay)) {
 			callbackInfo.cancel();
 		}
 	}

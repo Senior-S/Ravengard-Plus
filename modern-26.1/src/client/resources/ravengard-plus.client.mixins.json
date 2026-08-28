@@ -7,6 +7,7 @@
 		"GuiGraphicsExtractorMixin",
 		"InventoryScreenMixin",
 		"GuiMixin",
+		"EntityFullBrightMixin",
 		"DebugScreenEntryListMixin",
 		"DebugRendererMixin",
 		"EntityHitboxDebugRendererMixin"

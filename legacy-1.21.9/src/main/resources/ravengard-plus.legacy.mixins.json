@@ -6,6 +6,7 @@
 		"DrawContextMixin",
 		"InventoryScreenMixin",
 		"HudMixin",
+		"EntityFullBrightMixin",
 		"EntityRendererMixin",
 		"DebugHudProfileMixin"
 	],
