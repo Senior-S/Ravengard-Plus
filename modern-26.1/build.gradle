@@ -25,8 +25,7 @@ loom {
 }
 
 sourceSets.client.java {
-	setSrcDirs(['../src/client/java', 'src/client/java'])
-	exclude 'com/seniors/ravengardplus/client/mixin/HudMixin.java'
+	setSrcDirs(['../src/client/java', '../common/src/main/java', '../common/src/26.1/java'])
 }
 
 dependencies {

@@ -1,5 +1,6 @@
 package com.seniors.ravengardplus.client;
 
+import com.google.common.collect.Iterables;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.seniors.ravengardplus.client.accessory.AccessoryUpgradeDetector;
 import com.seniors.ravengardplus.client.ability.AbilityCooldownTracker;
@@ -14,6 +15,8 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.entity.player.Inventory;
 
 public class RavengardPlusClient implements ClientModInitializer {
 	public static final String MOD_ID = "ravengard-plus";
@@ -32,20 +35,25 @@ public class RavengardPlusClient implements ClientModInitializer {
 		ClientReceiveMessageEvents.GAME.register((message, overlay) -> AbilityCooldownTracker.onGameMessage(message.getString()));
 		ClientTickEvents.START_CLIENT_TICK.register(AbilityCooldownTracker::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			RavengardConfig config = RavengardConfig.HANDLER.instance();
+			Inventory inventory = client.player == null ? null : client.player.getInventory();
 			Iterable<ItemStack> candidates = null;
 			AbstractContainerScreen<?> containerScreen = null;
 			if (client.player != null) {
 				containerScreen = ScreenCompat.get(client) instanceof AbstractContainerScreen<?> screen ? screen : null;
-				candidates = containerScreen != null
-						? containerScreen.getMenu().getItems()
-						: client.player.getInventory().getNonEquipmentItems();
+				if (config.armorUpgradeIndicatorEnabled || config.accessoryUpgradeIndicatorEnabled) {
+					candidates = containerScreen != null
+							? Iterables.transform(containerScreen.getMenu().slots, Slot::getItem)
+							: inventory.getNonEquipmentItems();
+				}
 			}
-			ArmorUpgradeDetector.update(client.player, candidates);
-			AccessoryUpgradeDetector.update(client.player, candidates);
+			ArmorUpgradeDetector.update(client.player, candidates, config.armorUpgradeIndicatorEnabled);
+			AccessoryUpgradeDetector.update(inventory, candidates, config.accessoryUpgradeIndicatorEnabled);
 			CrownReplacementDetector.update(
-					client.player,
-					containerScreen == null ? null : containerScreen.getMenu(),
-					RavengardConfig.HANDLER.instance().crownReplacementEnabled
+					inventory,
+					containerScreen == null || containerScreen.getMenu() == client.player.inventoryMenu
+							? null : containerScreen.getMenu(),
+					config.crownReplacementEnabled
 			);
 
 			while (openConfig.consumeClick()) {

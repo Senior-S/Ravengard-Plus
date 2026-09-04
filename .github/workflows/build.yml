@@ -40,7 +40,15 @@ jobs:
             ${{ matrix.project }}/build/libs/ravengard-plus-*.jar
             !${{ matrix.project }}/build/libs/*-sources.jar
 
-  modern-26-1:
+  fabric:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: modern-26.1
+            artifact: ravengard-plus-mc26.1-26.1.2
+          - project: .
+            artifact: ravengard-plus-mc26.2
     runs-on: ubuntu-24.04
     steps:
       - name: checkout repository
@@ -55,42 +63,18 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
       - name: build
-        run: ./gradlew -p modern-26.1 build
+        run: ./gradlew -p ${{ matrix.project }} build
       - name: capture build artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: ravengard-plus-mc26.1-26.1.2
+          name: ${{ matrix.artifact }}
           path: |
-            modern-26.1/build/libs/ravengard-plus-*.jar
-            !modern-26.1/build/libs/*-sources.jar
-
-  modern:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: checkout repository
-        uses: actions/checkout@v6
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v6
-      - name: setup jdk
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew build
-      - name: capture build artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: ravengard-plus-mc26.2
-          path: |
-            build/libs/ravengard-plus-*.jar
-            !build/libs/*-sources.jar
+            ${{ matrix.project }}/build/libs/ravengard-plus-*.jar
+            !${{ matrix.project }}/build/libs/*-sources.jar
 
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [neoforge, modern-26-1, modern]
+    needs: [neoforge, fabric]
     runs-on: ubuntu-24.04
     permissions:
       contents: write

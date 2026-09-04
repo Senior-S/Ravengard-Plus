@@ -95,6 +95,10 @@ The NeoForge Mods screen and the `O` key both open the YACL configuration screen
 
 ## Building from source
 
+Shared Java code lives in `common/src/main/java`. The `common/src/26.1/java` and `common/src/26.2/java` directories contain the screen and HUD code for each version. Fabric and NeoForge have separate entrypoints.
+
+The root build runs the shared logic's regression tests with Java 25. Run `./gradlew test` to run those tests alone.
+
 Build the Minecraft 26.2 jar with Java 25:
 
 ```shell
