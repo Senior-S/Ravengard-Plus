@@ -1,26 +1,6 @@
 # Gradle and compiled output
-/.gradle/
-/build/
-/legacy/.gradle/
-/legacy/build/
-/legacy-1.21.11/.gradle/
-/legacy-1.21.11/build/
-/legacy-1.21.9/.gradle/
-/legacy-1.21.9/build/
-/modern-26.1/.gradle/
-/modern-26.1/build/
-/neoforge/.gradle/
-/neoforge/build/
-/neoforge-1.21.5/.gradle/
-/neoforge-1.21.5/build/
-/neoforge-1.21.6/.gradle/
-/neoforge-1.21.6/build/
-/neoforge-1.21.9/.gradle/
-/neoforge-1.21.9/build/
-/neoforge-1.21.11/.gradle/
-/neoforge-1.21.11/build/
-/neoforge-26.1/.gradle/
-/neoforge-26.1/build/
+.gradle/
+build/
 /out/
 /classes/
 /bin/
@@ -37,17 +17,7 @@
 .project
 
 # Development runtime
-/run/
-/legacy/run/
-/legacy-1.21.11/run/
-/legacy-1.21.9/run/
-/modern-26.1/run/
-/neoforge/run/
-/neoforge-1.21.5/run/
-/neoforge-1.21.6/run/
-/neoforge-1.21.9/run/
-/neoforge-1.21.11/run/
-/neoforge-26.1/run/
+run/
 /logs/
 /crash-reports/
 /saves/

@@ -13,23 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - project: neoforge-1.21.5
-            java: '21'
-            artifact: ravengard-plus-neoforge-mc1.21.5
-          - project: neoforge-1.21.6
-            java: '21'
-            artifact: ravengard-plus-neoforge-mc1.21.6-1.21.8
-          - project: neoforge-1.21.9
-            java: '21'
-            artifact: ravengard-plus-neoforge-mc1.21.9-1.21.10
-          - project: neoforge-1.21.11
-            java: '21'
-            artifact: ravengard-plus-neoforge-mc1.21.11
           - project: neoforge-26.1
-            java: '25'
             artifact: ravengard-plus-neoforge-mc26.1-26.1.2
           - project: neoforge
-            java: '25'
             artifact: ravengard-plus-neoforge-mc26.2
     runs-on: ubuntu-24.04
     steps:
@@ -40,7 +26,7 @@ jobs:
       - name: setup jdk
         uses: actions/setup-java@v5
         with:
-          java-version: ${{ matrix.java }}
+          java-version: '25'
           distribution: 'microsoft'
       - name: make gradle wrapper executable
         run: chmod +x ./${{ matrix.project }}/gradlew
@@ -102,81 +88,9 @@ jobs:
             build/libs/ravengard-plus-*.jar
             !build/libs/*-sources.jar
 
-  legacy:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: checkout repository
-        uses: actions/checkout@v6
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v6
-      - name: setup jdk
-        uses: actions/setup-java@v5
-        with:
-          java-version: '21'
-          distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew -p legacy build
-      - name: capture build artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: ravengard-plus-mc1.21.5-1.21.8
-          path: |
-            legacy/build/libs/ravengard-plus-*.jar
-            !legacy/build/libs/*-sources.jar
-
-  legacy-1-21-9:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: checkout repository
-        uses: actions/checkout@v6
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v6
-      - name: setup jdk
-        uses: actions/setup-java@v5
-        with:
-          java-version: '21'
-          distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew -p legacy-1.21.9 build
-      - name: capture build artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: ravengard-plus-mc1.21.9-1.21.10
-          path: |
-            legacy-1.21.9/build/libs/ravengard-plus-*.jar
-            !legacy-1.21.9/build/libs/*-sources.jar
-
-  legacy-1-21-11:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: checkout repository
-        uses: actions/checkout@v6
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v6
-      - name: setup jdk
-        uses: actions/setup-java@v5
-        with:
-          java-version: '21'
-          distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew -p legacy-1.21.11 build
-      - name: capture build artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: ravengard-plus-mc1.21.11
-          path: |
-            legacy-1.21.11/build/libs/ravengard-plus-*.jar
-            !legacy-1.21.11/build/libs/*-sources.jar
-
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [neoforge, modern-26-1, modern, legacy, legacy-1-21-9, legacy-1-21-11]
+    needs: [neoforge, modern-26-1, modern]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -194,17 +108,11 @@ jobs:
         run: |
           version="$(sed -n 's/^mod_version=//p' gradle.properties)"
           modern_26_1_version="$(sed -n 's/^mod_version=//p' modern-26.1/gradle.properties)"
-          legacy_version="$(sed -n 's/^mod_version=//p' legacy/gradle.properties)"
-          legacy_1_21_9_version="$(sed -n 's/^mod_version=//p' legacy-1.21.9/gradle.properties)"
-          legacy_1_21_11_version="$(sed -n 's/^mod_version=//p' legacy-1.21.11/gradle.properties)"
           test -n "$version"
-          for project in neoforge neoforge-26.1 neoforge-1.21.5 neoforge-1.21.6 neoforge-1.21.9 neoforge-1.21.11; do
+          for project in neoforge neoforge-26.1; do
             test "$version" = "$(sed -n 's/^mod_version=//p' "$project/gradle.properties")"
           done
           test "$version" = "$modern_26_1_version"
-          test "$version" = "$legacy_version"
-          test "$version" = "$legacy_1_21_9_version"
-          test "$version" = "$legacy_1_21_11_version"
           tag="v$version"
 
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
