@@ -15,8 +15,10 @@ jobs:
         include:
           - project: neoforge-26.1
             artifact: ravengard-plus-neoforge-mc26.1-26.1.2
-          - project: neoforge
+          - project: neoforge-26.2
             artifact: ravengard-plus-neoforge-mc26.2
+          - project: neoforge
+            artifact: ravengard-plus-neoforge-mc26.3
     runs-on: ubuntu-24.04
     steps:
       - name: checkout repository
@@ -47,8 +49,10 @@ jobs:
         include:
           - project: modern-26.1
             artifact: ravengard-plus-mc26.1-26.1.2
-          - project: .
+          - project: modern-26.2
             artifact: ravengard-plus-mc26.2
+          - project: .
+            artifact: ravengard-plus-mc26.3
     runs-on: ubuntu-24.04
     steps:
       - name: checkout repository
@@ -91,12 +95,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version="$(sed -n 's/^mod_version=//p' gradle.properties)"
-          modern_26_1_version="$(sed -n 's/^mod_version=//p' modern-26.1/gradle.properties)"
           test -n "$version"
-          for project in neoforge neoforge-26.1; do
+          for project in neoforge neoforge-26.1 neoforge-26.2 modern-26.1 modern-26.2; do
             test "$version" = "$(sed -n 's/^mod_version=//p' "$project/gradle.properties")"
           done
-          test "$version" = "$modern_26_1_version"
           tag="v$version"
 
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then

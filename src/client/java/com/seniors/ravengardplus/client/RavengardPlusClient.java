@@ -27,7 +27,6 @@ public class RavengardPlusClient implements ClientModInitializer {
 
 		KeyMapping openConfig = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 				"key.ravengard-plus.open_config",
-				InputConstants.Type.KEYSYM,
 				InputConstants.KEY_O,
 				KeyMapping.Category.register(id("general"))
 		));

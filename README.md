@@ -5,7 +5,7 @@
 <h1 align="center">Ravengard Plus</h1>
 
 <p align="center">
-  Client-side item utilities for Hypixel Ravengard on Minecraft 26.1, 26.1.1, 26.1.2, and 26.2, with Fabric and NeoForge builds.
+  Client-side item utilities for Hypixel Ravengard on Minecraft 26.1, 26.1.1, 26.1.2, 26.2, and 26.3, with Fabric and NeoForge builds.
 </p>
 
 <p align="center">
@@ -77,6 +77,7 @@ Locale files live in the root `translations` directory and are included in every
 | --- | --- | --- | --- |
 | 26.1-26.1.2 | `+mc26.1-26.1.2` | 25 or newer | 3.9.5 or newer for Minecraft 26.1 |
 | 26.2 | `+mc26.2` | 25 or newer | 3.9.5 or newer for Minecraft 26.2 |
+| 26.3 | `+mc26.3` | 25 or newer | 3.9.5 or newer for Minecraft 26.3 |
 
 All versions require Fabric Loader 0.19.3 or newer.
 
@@ -90,16 +91,17 @@ All versions require Fabric Loader 0.19.3 or newer.
 | --- | --- | --- | --- |
 | 26.1-26.1.2 | `+mc26.1-26.1.2-neoforge` | 25 or newer | 3.9.6 or newer for Minecraft 26.1 |
 | 26.2 | `+mc26.2-neoforge` | 25 or newer | 3.9.5 or newer for Minecraft 26.2 |
+| 26.3 | `+mc26.3-neoforge` | 25 or newer | 3.9.7 or newer for Minecraft 26.3 |
 
 The NeoForge Mods screen and the `O` key both open the YACL configuration screen.
 
 ## Building from source
 
-Shared Java code lives in `common/src/main/java`. The `common/src/26.1/java` and `common/src/26.2/java` directories contain the screen and HUD code for each version. Fabric and NeoForge have separate entrypoints.
+Shared Java code lives in `common/src/main/java`. The `common/src/26.1/java` and `common/src/26.2/java` directories contain the screen and HUD code for each version. Minecraft 26.3 uses the 26.2 code. Fabric and NeoForge have separate entrypoints.
 
 The root build runs the shared logic's regression tests with Java 25. Run `./gradlew test` to run those tests alone.
 
-Build the Minecraft 26.2 jar with Java 25:
+Build the Minecraft 26.3 jar with Java 25:
 
 ```shell
 ./gradlew build
@@ -109,13 +111,15 @@ Build the NeoForge jars from the repository root. Use Java 25:
 
 ```shell
 ./neoforge-26.1/gradlew -p neoforge-26.1 build
+./neoforge-26.2/gradlew -p neoforge-26.2 build
 ./neoforge/gradlew -p neoforge build
 ```
 
-Build the Minecraft 26.1-26.1.2 jar with Java 25:
+Build the Minecraft 26.1-26.1.2 and 26.2 jars with Java 25:
 
 ```shell
 ./gradlew -p modern-26.1 build
+./gradlew -p modern-26.2 build
 ```
 
 Each jar is written to its project's `build/libs` directory.

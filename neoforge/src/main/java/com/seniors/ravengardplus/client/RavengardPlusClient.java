@@ -34,7 +34,6 @@ public class RavengardPlusClient {
 		KeyMapping.Category category = new KeyMapping.Category(id("general"));
 		KeyMapping openConfig = new KeyMapping(
 				"key.ravengard-plus.open_config",
-				InputConstants.Type.KEYSYM,
 				InputConstants.KEY_O,
 				category
 		);
