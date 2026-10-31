@@ -37,6 +37,9 @@ public class RavengardConfig {
 	private static final Color DEFAULT_ARMOR_UPGRADE_COLOR = new Color(0x55FF7F);
 	private static final Color DEFAULT_ACCESSORY_UPGRADE_COLOR = new Color(0x55D6FF);
 	private static final Color DEFAULT_PLAYER_HITBOX_COLOR = new Color(0xFF0000);
+	private static final Color DEFAULT_DOOR_OPEN_COLOR = new Color(0x55FF55);
+	private static final Color DEFAULT_DOOR_CLOSED_COLOR = new Color(0xFF5555);
+	private static final int DEFAULT_DOOR_RANGE = 24;
 	private static final String DEFAULT_ABILITY_SOUND = "minecraft:block.note_block.pling";
 
 	public static final ConfigClassHandler<RavengardConfig> HANDLER = ConfigClassHandler
@@ -73,6 +76,9 @@ public class RavengardConfig {
 	public boolean crownReplacementEnabled = true;
 
 	@SerialEntry
+	public boolean crownReplacementIncludeHealthItems = false;
+
+	@SerialEntry
 	public boolean armorUpgradeIndicatorEnabled = true;
 
 	@SerialEntry
@@ -101,6 +107,30 @@ public class RavengardConfig {
 
 	@SerialEntry
 	public boolean entityFullBrightEnabled = true;
+
+	@SerialEntry
+	public boolean teammateGlowColorsEnabled = true;
+
+	@SerialEntry
+	public boolean mapCenterMarkerEnabled = true;
+
+	@SerialEntry
+	public boolean exitPortalMarkersEnabled = true;
+
+	@SerialEntry
+	public boolean doorIndicatorsEnabled = true;
+
+	@SerialEntry
+	public DoorIndicatorStyle doorIndicatorStyle = DoorIndicatorStyle.MARKER;
+
+	@SerialEntry
+	public int doorIndicatorRange = DEFAULT_DOOR_RANGE;
+
+	@SerialEntry
+	public Color doorOpenColor = DEFAULT_DOOR_OPEN_COLOR;
+
+	@SerialEntry
+	public Color doorClosedColor = DEFAULT_DOOR_CLOSED_COLOR;
 
 	@SerialEntry
 	public boolean alwaysShowHitboxes = false;
@@ -179,6 +209,12 @@ public class RavengardConfig {
 								.binding(true, () -> config.crownReplacementEnabled, value -> config.crownReplacementEnabled = value)
 								.controller(BooleanControllerBuilder::create)
 								.build())
+						.option(Option.<Boolean>createBuilder()
+								.name(Component.translatable("ravengard-plus.config.crown_replacement_health_items"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.crown_replacement_health_items.description")))
+								.binding(false, () -> config.crownReplacementIncludeHealthItems, value -> config.crownReplacementIncludeHealthItems = value)
+								.controller(BooleanControllerBuilder::create)
+								.build())
 						.option(ButtonOption.createBuilder()
 								.name(Component.translatable("ravengard-plus.config.add_tier"))
 								.text(Component.translatable("ravengard-plus.config.add"))
@@ -229,32 +265,35 @@ public class RavengardConfig {
 				.title(Component.translatable("ravengard-plus.config.title"))
 				.category(category.build())
 				.category(ConfigCategory.createBuilder()
-						.name(Component.translatable("ravengard-plus.config.armor_upgrades"))
-						.option(Option.<Boolean>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.armor_upgrade_indicator"))
-								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.armor_upgrade_indicator.description")))
-								.binding(true, () -> config.armorUpgradeIndicatorEnabled, value -> config.armorUpgradeIndicatorEnabled = value)
-								.controller(BooleanControllerBuilder::create)
+						.name(Component.translatable("ravengard-plus.config.upgrades"))
+						.group(OptionGroup.createBuilder()
+								.name(Component.translatable("ravengard-plus.config.armor_upgrades"))
+								.option(Option.<Boolean>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.armor_upgrade_indicator"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.armor_upgrade_indicator.description")))
+										.binding(true, () -> config.armorUpgradeIndicatorEnabled, value -> config.armorUpgradeIndicatorEnabled = value)
+										.controller(BooleanControllerBuilder::create)
+										.build())
+								.option(Option.<Color>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.armor_upgrade_color"))
+										.binding(DEFAULT_ARMOR_UPGRADE_COLOR, () -> config.armorUpgradeColor, value -> config.armorUpgradeColor = value)
+										.controller(ColorControllerBuilder::create)
+										.build())
 								.build())
-						.option(Option.<Color>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.armor_upgrade_color"))
-								.binding(DEFAULT_ARMOR_UPGRADE_COLOR, () -> config.armorUpgradeColor, value -> config.armorUpgradeColor = value)
-								.controller(ColorControllerBuilder::create)
-								.build())
-						.build())
-				.category(ConfigCategory.createBuilder()
-						.name(Component.translatable("ravengard-plus.config.accessory_upgrades"))
-						.tooltip(Component.translatable("ravengard-plus.config.accessory_upgrades.description"))
-						.option(Option.<Boolean>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.accessory_upgrade_indicator"))
-								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.accessory_upgrade_indicator.description")))
-								.binding(true, () -> config.accessoryUpgradeIndicatorEnabled, value -> config.accessoryUpgradeIndicatorEnabled = value)
-								.controller(BooleanControllerBuilder::create)
-								.build())
-						.option(Option.<Color>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.accessory_upgrade_color"))
-								.binding(DEFAULT_ACCESSORY_UPGRADE_COLOR, () -> config.accessoryUpgradeColor, value -> config.accessoryUpgradeColor = value)
-								.controller(ColorControllerBuilder::create)
+						.group(OptionGroup.createBuilder()
+								.name(Component.translatable("ravengard-plus.config.accessory_upgrades"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.accessory_upgrades.description")))
+								.option(Option.<Boolean>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.accessory_upgrade_indicator"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.accessory_upgrade_indicator.description")))
+										.binding(true, () -> config.accessoryUpgradeIndicatorEnabled, value -> config.accessoryUpgradeIndicatorEnabled = value)
+										.controller(BooleanControllerBuilder::create)
+										.build())
+								.option(Option.<Color>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.accessory_upgrade_color"))
+										.binding(DEFAULT_ACCESSORY_UPGRADE_COLOR, () -> config.accessoryUpgradeColor, value -> config.accessoryUpgradeColor = value)
+										.controller(ColorControllerBuilder::create)
+										.build())
 								.build())
 						.build())
 				.category(ConfigCategory.createBuilder()
@@ -299,31 +338,83 @@ public class RavengardConfig {
 								.binding(true, () -> config.entityFullBrightEnabled, value -> config.entityFullBrightEnabled = value)
 								.controller(BooleanControllerBuilder::create)
 								.build())
-						.build())
-				.category(ConfigCategory.createBuilder()
-						.name(Component.translatable("ravengard-plus.config.hitboxes"))
-						.tooltip(Component.translatable("ravengard-plus.config.hitboxes.description"))
 						.option(Option.<Boolean>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.always_show_hitboxes"))
-								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.always_show_hitboxes.description")))
-								.binding(false, () -> config.alwaysShowHitboxes, value -> config.alwaysShowHitboxes = value)
+								.name(Component.translatable("ravengard-plus.config.teammate_glow_colors"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.teammate_glow_colors.description")))
+								.binding(true, () -> config.teammateGlowColorsEnabled, value -> config.teammateGlowColorsEnabled = value)
 								.controller(BooleanControllerBuilder::create)
 								.build())
 						.option(Option.<Boolean>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.hide_armor_stand_hitboxes"))
-								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.hide_armor_stand_hitboxes.description")))
-								.binding(true, () -> config.hideArmorStandHitboxes, value -> config.hideArmorStandHitboxes = value)
+								.name(Component.translatable("ravengard-plus.config.map_center_marker"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.map_center_marker.description")))
+								.binding(true, () -> config.mapCenterMarkerEnabled, value -> config.mapCenterMarkerEnabled = value)
 								.controller(BooleanControllerBuilder::create)
 								.build())
-						.option(Option.<Color>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.player_hitbox_color"))
-								.binding(DEFAULT_PLAYER_HITBOX_COLOR, () -> config.playerHitboxColor, value -> config.playerHitboxColor = value)
-								.controller(ColorControllerBuilder::create)
+						.option(Option.<Boolean>createBuilder()
+								.name(Component.translatable("ravengard-plus.config.exit_portal_markers"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.exit_portal_markers.description")))
+								.binding(true, () -> config.exitPortalMarkersEnabled, value -> config.exitPortalMarkersEnabled = value)
+								.controller(BooleanControllerBuilder::create)
 								.build())
-						.option(Option.<Color>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.mob_hitbox_color"))
-								.binding(Color.WHITE, () -> config.mobHitboxColor, value -> config.mobHitboxColor = value)
-								.controller(ColorControllerBuilder::create)
+						.group(OptionGroup.createBuilder()
+								.name(Component.translatable("ravengard-plus.config.doors"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.doors.description")))
+								.option(Option.<Boolean>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.door_indicators"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.door_indicators.description")))
+										.binding(true, () -> config.doorIndicatorsEnabled, value -> config.doorIndicatorsEnabled = value)
+										.controller(BooleanControllerBuilder::create)
+										.build())
+								.option(Option.<DoorIndicatorStyle>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.door_indicator_style"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.door_indicator_style.description")))
+										.binding(DoorIndicatorStyle.MARKER, () -> config.doorIndicatorStyle, value -> config.doorIndicatorStyle = value)
+										.controller(option -> EnumControllerBuilder.create(option).enumClass(DoorIndicatorStyle.class))
+										.build())
+								.option(Option.<Integer>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.door_indicator_range"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.door_indicator_range.description")))
+										.binding(DEFAULT_DOOR_RANGE, () -> config.doorIndicatorRange, value -> config.doorIndicatorRange = value)
+										.controller(option -> IntegerSliderControllerBuilder.create(option).range(8, 128).step(8))
+										.build())
+								.option(Option.<Color>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.door_open_color"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.door_open_color.description")))
+										.binding(DEFAULT_DOOR_OPEN_COLOR, () -> config.doorOpenColor, value -> config.doorOpenColor = value)
+										.controller(ColorControllerBuilder::create)
+										.build())
+								.option(Option.<Color>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.door_closed_color"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.door_closed_color.description")))
+										.binding(DEFAULT_DOOR_CLOSED_COLOR, () -> config.doorClosedColor, value -> config.doorClosedColor = value)
+										.controller(ColorControllerBuilder::create)
+										.build())
+								.build())
+						.group(OptionGroup.createBuilder()
+								.name(Component.translatable("ravengard-plus.config.hitboxes"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.hitboxes.description")))
+								.option(Option.<Boolean>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.always_show_hitboxes"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.always_show_hitboxes.description")))
+										.binding(false, () -> config.alwaysShowHitboxes, value -> config.alwaysShowHitboxes = value)
+										.controller(BooleanControllerBuilder::create)
+										.build())
+								.option(Option.<Boolean>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.hide_armor_stand_hitboxes"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.hide_armor_stand_hitboxes.description")))
+										.binding(true, () -> config.hideArmorStandHitboxes, value -> config.hideArmorStandHitboxes = value)
+										.controller(BooleanControllerBuilder::create)
+										.build())
+								.option(Option.<Color>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.player_hitbox_color"))
+										.binding(DEFAULT_PLAYER_HITBOX_COLOR, () -> config.playerHitboxColor, value -> config.playerHitboxColor = value)
+										.controller(ColorControllerBuilder::create)
+										.build())
+								.option(Option.<Color>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.mob_hitbox_color"))
+										.binding(Color.WHITE, () -> config.mobHitboxColor, value -> config.mobHitboxColor = value)
+										.controller(ColorControllerBuilder::create)
+										.build())
 								.build())
 						.build())
 				.save(HANDLER::save)
@@ -353,6 +444,22 @@ public class RavengardConfig {
 		@Override
 		public Component getDisplayName() {
 			return Component.translatable("ravengard-plus.config.border_style." + translationKey);
+		}
+	}
+
+	public enum DoorIndicatorStyle implements NameableEnum {
+		MARKER("marker"),
+		GLOW("glow");
+
+		private final String translationKey;
+
+		DoorIndicatorStyle(String translationKey) {
+			this.translationKey = translationKey;
+		}
+
+		@Override
+		public Component getDisplayName() {
+			return Component.translatable("ravengard-plus.config.door_indicator_style." + translationKey);
 		}
 	}
 

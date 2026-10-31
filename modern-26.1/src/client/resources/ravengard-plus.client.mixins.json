@@ -8,6 +8,9 @@
 		"InventoryScreenMixin",
 		"GuiMixin",
 		"EntityFullBrightMixin",
+		"TeammateGlowMixin",
+		"DoorGlowMixin",
+		"ItemDisplayAccessor",
 		"DebugScreenEntryListMixin",
 		"DebugRendererMixin",
 		"EntityHitboxDebugRendererMixin"

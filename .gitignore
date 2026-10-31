@@ -36,3 +36,6 @@ replay_*.log
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Tests stay local
+src/test/

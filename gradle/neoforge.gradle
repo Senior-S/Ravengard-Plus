@@ -48,8 +48,8 @@ tasks.withType(ProcessResources).configureEach {
 		into 'assets/ravengard-plus/lang'
 	}
 
-	from('../src/main/resources/assets/ravengard-plus/textures') {
-		into 'assets/ravengard-plus/textures'
+	from('../src/main/resources/assets') {
+		into 'assets'
 	}
 
 	filesMatching('META-INF/neoforge.mods.toml') {

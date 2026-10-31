@@ -1,9 +1,12 @@
 package com.seniors.ravengardplus.client.item;
 
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemLore;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -17,6 +20,11 @@ public final class CrownReplacementDetector {
 	}
 
 	public static void update(Inventory inventory, AbstractContainerMenu menu, boolean enabled) {
+		update(inventory, menu, enabled, false);
+	}
+
+	// Health items are left out unless includeHealthItems is set, so they are never offered for replacement
+	public static void update(Inventory inventory, AbstractContainerMenu menu, boolean enabled, boolean includeHealthItems) {
 		cheapestItem = null;
 		REJECTED_CONTAINER_ITEMS.clear();
 		if (!enabled || inventory == null || menu == null) {
@@ -33,6 +41,9 @@ public final class CrownReplacementDetector {
 			ItemStack stack = inventory.getItem(index);
 			if (stack.isEmpty()) {
 				return;
+			}
+			if (!includeHealthItems && isHealthItem(stack)) {
+				continue;
 			}
 			double value = LoreValueParser.find(stack, "Crown");
 			if (value >= 0 && value < cheapestValue) {
@@ -51,6 +62,9 @@ public final class CrownReplacementDetector {
 			}
 
 			ItemStack stack = slot.getItem();
+			if (!includeHealthItems && isHealthItem(stack)) {
+				continue;
+			}
 			double value = LoreValueParser.find(stack, "Crown");
 			if (value > cheapestValue) {
 				hasBetterItem = true;
@@ -61,6 +75,21 @@ public final class CrownReplacementDetector {
 		if (hasBetterItem) {
 			cheapestItem = candidate;
 		}
+	}
+
+	// Healing consumables describe themselves as "Heals +50 HP over 5 seconds."
+	static boolean isHealthItem(ItemStack stack) {
+		ItemLore lore = stack.get(DataComponents.LORE);
+		if (lore == null) {
+			return false;
+		}
+		for (Component line : lore.lines()) {
+			String text = line.getString();
+			if (text.contains("Heals") && text.contains("HP")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static boolean isCheapest(ItemStack stack) {

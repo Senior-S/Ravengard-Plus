@@ -2,6 +2,9 @@ package com.seniors.ravengardplus.client.mixin;
 
 import com.seniors.ravengardplus.client.ability.AbilityCooldownTracker;
 import com.seniors.ravengardplus.client.config.RavengardConfig;
+import com.seniors.ravengardplus.client.door.DoorTracker;
+import com.seniors.ravengardplus.client.marker.MapCenterMarker;
+import com.seniors.ravengardplus.client.portal.ExitPortalTracker;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -14,6 +17,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
 public class GuiMixin {
+	@Inject(method = "extractRenderState", at = @At("HEAD"))
+	private void ravengardPlus$drawMapCenterMarker(
+			GuiGraphicsExtractor graphics,
+			DeltaTracker deltaTracker,
+			CallbackInfo callbackInfo
+	) {
+		if (!Minecraft.getInstance().options.hideGui) {
+			DoorTracker.drawMarkers(graphics);
+			ExitPortalTracker.drawMarkers(graphics);
+			MapCenterMarker.draw(graphics);
+		}
+	}
+
 	@Inject(method = "extractRenderState", at = @At("TAIL"))
 	private void ravengardPlus$drawAbilityCooldowns(
 			GuiGraphicsExtractor graphics,

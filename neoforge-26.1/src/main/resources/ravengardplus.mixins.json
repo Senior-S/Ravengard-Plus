@@ -4,6 +4,9 @@
 	"compatibilityLevel": "JAVA_25",
 	"client": [
 		"EntityFullBrightMixin",
+		"TeammateGlowMixin",
+		"DoorGlowMixin",
+		"ItemDisplayAccessor",
 		"UpgradeIndicatorMixin",
 		"GuiGraphicsExtractorMixin",
 		"InventoryScreenMixin",
