@@ -37,8 +37,7 @@ public class RavengardConfig {
 	private static final Color DEFAULT_ARMOR_UPGRADE_COLOR = new Color(0x55FF7F);
 	private static final Color DEFAULT_ACCESSORY_UPGRADE_COLOR = new Color(0x55D6FF);
 	private static final Color DEFAULT_PLAYER_HITBOX_COLOR = new Color(0xFF0000);
-	private static final Color DEFAULT_DOOR_OPEN_COLOR = new Color(0x55FF55);
-	private static final Color DEFAULT_DOOR_CLOSED_COLOR = new Color(0xFF5555);
+	private static final Color DEFAULT_DOOR_COLOR = new Color(0xFFAA00);
 	private static final int DEFAULT_DOOR_RANGE = 24;
 	private static final String DEFAULT_ABILITY_SOUND = "minecraft:block.note_block.pling";
 
@@ -127,10 +126,7 @@ public class RavengardConfig {
 	public int doorIndicatorRange = DEFAULT_DOOR_RANGE;
 
 	@SerialEntry
-	public Color doorOpenColor = DEFAULT_DOOR_OPEN_COLOR;
-
-	@SerialEntry
-	public Color doorClosedColor = DEFAULT_DOOR_CLOSED_COLOR;
+	public Color doorColor = DEFAULT_DOOR_COLOR;
 
 	@SerialEntry
 	public boolean alwaysShowHitboxes = false;
@@ -378,15 +374,9 @@ public class RavengardConfig {
 										.controller(option -> IntegerSliderControllerBuilder.create(option).range(8, 128).step(8))
 										.build())
 								.option(Option.<Color>createBuilder()
-										.name(Component.translatable("ravengard-plus.config.door_open_color"))
-										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.door_open_color.description")))
-										.binding(DEFAULT_DOOR_OPEN_COLOR, () -> config.doorOpenColor, value -> config.doorOpenColor = value)
-										.controller(ColorControllerBuilder::create)
-										.build())
-								.option(Option.<Color>createBuilder()
-										.name(Component.translatable("ravengard-plus.config.door_closed_color"))
-										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.door_closed_color.description")))
-										.binding(DEFAULT_DOOR_CLOSED_COLOR, () -> config.doorClosedColor, value -> config.doorClosedColor = value)
+										.name(Component.translatable("ravengard-plus.config.door_color"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.door_color.description")))
+										.binding(DEFAULT_DOOR_COLOR, () -> config.doorColor, value -> config.doorColor = value)
 										.controller(ColorControllerBuilder::create)
 										.build())
 								.build())
