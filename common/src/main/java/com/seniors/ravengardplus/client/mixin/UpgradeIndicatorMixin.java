@@ -1,5 +1,6 @@
 package com.seniors.ravengardplus.client.mixin;
 
+import com.seniors.ravengardplus.client.GuiQuads;
 import com.seniors.ravengardplus.client.accessory.AccessoryUpgradeDetector;
 import com.seniors.ravengardplus.client.armor.ArmorUpgradeDetector;
 import com.seniors.ravengardplus.client.config.RavengardConfig;
@@ -38,9 +39,9 @@ public class UpgradeIndicatorMixin {
 		}
 
 		GuiGraphicsExtractor graphics = (GuiGraphicsExtractor) (Object) this;
-		graphics.fill(x + 11, y - 1, x + 17, y + 6, 0xB0000000);
-		graphics.fill(x + 13, y, x + 15, y + 1, color);
-		graphics.fill(x + 12, y + 1, x + 16, y + 2, color);
-		graphics.fill(x + 13, y + 2, x + 15, y + 6, color);
+		GuiQuads.fill(graphics, x + 11, y - 1, x + 17, y + 6, 0xB0000000);
+		GuiQuads.fill(graphics, x + 13, y, x + 15, y + 1, color);
+		GuiQuads.fill(graphics, x + 12, y + 1, x + 16, y + 2, color);
+		GuiQuads.fill(graphics, x + 13, y + 2, x + 15, y + 6, color);
 	}
 }

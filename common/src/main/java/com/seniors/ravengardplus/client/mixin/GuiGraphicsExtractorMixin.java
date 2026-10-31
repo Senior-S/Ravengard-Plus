@@ -1,5 +1,6 @@
 package com.seniors.ravengardplus.client.mixin;
 
+import com.seniors.ravengardplus.client.GuiQuads;
 import com.seniors.ravengardplus.client.config.RavengardConfig;
 import com.seniors.ravengardplus.client.item.LoreValueParser;
 import com.seniors.ravengardplus.client.item.CrownReplacementDetector;
@@ -86,9 +87,9 @@ public class GuiGraphicsExtractorMixin {
 		GuiGraphicsExtractor graphics = (GuiGraphicsExtractor) (Object) this;
 		if (config.crownReplacementEnabled) {
 			if (CrownReplacementDetector.isCheapest(stack)) {
-				graphics.fill(x, y, x + 16, y + 16, 0x66FFFFFF);
+				GuiQuads.fill(graphics, x, y, x + 16, y + 16, 0x66FFFFFF);
 			} else if (CrownReplacementDetector.isRejectedContainerItem(stack)) {
-				graphics.fill(x, y, x + 16, y + 16, 0x70C0C0C0);
+				GuiQuads.fill(graphics, x, y, x + 16, y + 16, 0x70C0C0C0);
 			}
 		}
 		if (!config.crownValueOverlayEnabled) {
@@ -123,22 +124,22 @@ public class GuiGraphicsExtractorMixin {
 	) {
 		switch (style) {
 			case PIXEL_CORNERS -> {
-				graphics.fill(x - 1, y - 1, x + 3, y, color);
-				graphics.fill(x - 1, y - 1, x, y + 3, color);
-				graphics.fill(x + 13, y - 1, x + 17, y, color);
-				graphics.fill(x + 16, y - 1, x + 17, y + 3, color);
-				graphics.fill(x - 1, y + 16, x + 3, y + 17, color);
-				graphics.fill(x - 1, y + 13, x, y + 17, color);
-				graphics.fill(x + 13, y + 16, x + 17, y + 17, color);
-				graphics.fill(x + 16, y + 13, x + 17, y + 17, color);
+				GuiQuads.fill(graphics, x - 1, y - 1, x + 3, y, color);
+				GuiQuads.fill(graphics, x - 1, y - 1, x, y + 3, color);
+				GuiQuads.fill(graphics, x + 13, y - 1, x + 17, y, color);
+				GuiQuads.fill(graphics, x + 16, y - 1, x + 17, y + 3, color);
+				GuiQuads.fill(graphics, x - 1, y + 16, x + 3, y + 17, color);
+				GuiQuads.fill(graphics, x - 1, y + 13, x, y + 17, color);
+				GuiQuads.fill(graphics, x + 13, y + 16, x + 17, y + 17, color);
+				GuiQuads.fill(graphics, x + 16, y + 13, x + 17, y + 17, color);
 			}
-			case BOTTOM_STRIPE -> graphics.fill(x + 2, y + 16, x + 14, y + 18, color);
+			case BOTTOM_STRIPE -> GuiQuads.fill(graphics, x + 2, y + 16, x + 14, y + 18, color);
 			case SIDE_MARKERS -> {
-				graphics.fill(x - 1, y + 5, x, y + 11, color);
-				graphics.fill(x + 16, y + 5, x + 17, y + 11, color);
+				GuiQuads.fill(graphics, x - 1, y + 5, x, y + 11, color);
+				GuiQuads.fill(graphics, x + 16, y + 5, x + 17, y + 11, color);
 			}
-			case SOFT_TINT -> graphics.fill(x - 1, y - 1, x + 17, y + 17, (color & 0x00FFFFFF) | 0x38000000);
-			case FULL_OUTLINE -> graphics.outline(x - 1, y - 1, 18, 18, color);
+			case SOFT_TINT -> GuiQuads.fill(graphics, x - 1, y - 1, x + 17, y + 17, (color & 0x00FFFFFF) | 0x38000000);
+			case FULL_OUTLINE -> GuiQuads.outline(graphics, x - 1, y - 1, 18, 18, color);
 		}
 	}
 }
