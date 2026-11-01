@@ -2,6 +2,7 @@ package com.seniors.ravengardplus.client.marker;
 
 import com.seniors.ravengardplus.client.config.RavengardConfig;
 import com.seniors.ravengardplus.client.minimap.MinimapReader;
+import com.seniors.ravengardplus.client.ping.PingMarkers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -27,7 +28,8 @@ public final class MapCenterMarker {
 		}
 
 		Vec3 center = new Vec3(0, client.player.getY() + HEIGHT_ABOVE_PLAYER, 0);
-		WorldMarker.draw(graphics, center, ICON, ICON_COLOR,
+		float opacity = PingMarkers.opacity(RavengardConfig.HANDLER.instance().mapCenterMarkerOpacity);
+		WorldMarker.draw(graphics, center, 1, opacity, ICON, ICON_COLOR,
 				new WorldMarker.Line(Component.translatable("ravengard-plus.map_center"), LABEL_COLOR),
 				new WorldMarker.Line(Component.literal(Math.round(client.player.position().distanceTo(center)) + "m"), DISTANCE_COLOR));
 	}

@@ -4,6 +4,7 @@ import com.seniors.ravengardplus.client.config.RavengardConfig;
 import com.seniors.ravengardplus.client.marker.ProximityPuff;
 import com.seniors.ravengardplus.client.marker.WorldMarker;
 import com.seniors.ravengardplus.client.mixin.ItemDisplayAccessor;
+import com.seniors.ravengardplus.client.ping.PingMarkers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.component.DataComponents;
@@ -92,6 +93,7 @@ public final class DoorTracker {
 		}
 
 		int color = config.doorColor.getRGB() | 0xFF000000;
+		float opacity = PingMarkers.opacity(config.doorMarkerOpacity);
 		PUFF.beginFrame();
 		// Farthest first, so nearer markers are drawn on top
 		Vec3 eye = client.player.getEyePosition();
@@ -100,7 +102,7 @@ public final class DoorTracker {
 		for (Door door : sorted) {
 			float shown = PUFF.update(door.position(), client.player.position());
 			float scale = scale(door.position().distanceTo(eye)) * ProximityPuff.growth(shown);
-			WorldMarker.draw(graphics, door.position(), scale, shown, ICON, color,
+			WorldMarker.draw(graphics, door.position(), scale, shown * opacity, ICON, color,
 					new WorldMarker.Line(Component.translatable("ravengard-plus.door"), LABEL_COLOR));
 		}
 		PUFF.endFrame();

@@ -34,6 +34,7 @@ public class RavengardConfig {
 	private static final Color DEFAULT_DOOR_COLOR = new Color(0xFFAA00);
 	private static final int DEFAULT_DOOR_RANGE = 24;
 	private static final String DEFAULT_ABILITY_SOUND = "minecraft:block.note_block.pling";
+	private static final String DEFAULT_PING_SOUND = "minecraft:block.note_block.bell";
 
 	public static final ConfigClassHandler<RavengardConfig> HANDLER = ConfigClassHandler
 			.createBuilder(RavengardConfig.class)
@@ -112,10 +113,31 @@ public class RavengardConfig {
 	public boolean mapCenterMarkerEnabled = true;
 
 	@SerialEntry
+	public int mapCenterMarkerOpacity = 100;
+
+	@SerialEntry
+	public int doorMarkerOpacity = 100;
+
+	@SerialEntry
+	public int pingDuration = 8;
+
+	@SerialEntry
+	public int pingMarkerOpacity = 100;
+
+	@SerialEntry
 	public boolean exitPortalMarkersEnabled = true;
 
 	@SerialEntry
 	public boolean doorIndicatorsEnabled = true;
+
+	@SerialEntry
+	public boolean pingsEnabled = true;
+
+	@SerialEntry
+	public boolean pingSoundEnabled = true;
+
+	@SerialEntry
+	public String pingSound = DEFAULT_PING_SOUND;
 
 	@SerialEntry
 	public DoorIndicatorStyle doorIndicatorStyle = DoorIndicatorStyle.MARKER;
@@ -141,6 +163,14 @@ public class RavengardConfig {
 				.name(Component.translatable("ravengard-plus.config.ability_cooldown_sound"))
 				.description(OptionDescription.of(Component.translatable("ravengard-plus.config.ability_cooldown_sound.description")))
 				.binding(DEFAULT_ABILITY_SOUND, () -> config.abilityCooldownSound, value -> config.abilityCooldownSound = value)
+				.controller(option -> DropdownStringControllerBuilder.create(option)
+						.values(BuiltInRegistries.SOUND_EVENT.keySet().stream().map(Object::toString).sorted().toList())
+						.allowAnyValue(false))
+				.build();
+		Option<String> pingSoundOption = Option.<String>createBuilder()
+				.name(Component.translatable("ravengard-plus.config.ping_sound_choice"))
+				.description(OptionDescription.of(Component.translatable("ravengard-plus.config.ability_cooldown_sound.description")))
+				.binding(DEFAULT_PING_SOUND, () -> config.pingSound, value -> config.pingSound = value)
 				.controller(option -> DropdownStringControllerBuilder.create(option)
 						.values(BuiltInRegistries.SOUND_EVENT.keySet().stream().map(Object::toString).sorted().toList())
 						.allowAnyValue(false))
@@ -297,6 +327,13 @@ public class RavengardConfig {
 								.binding(true, () -> config.mapCenterMarkerEnabled, value -> config.mapCenterMarkerEnabled = value)
 								.controller(BooleanControllerBuilder::create)
 								.build())
+						.option(Option.<Integer>createBuilder()
+								.name(Component.translatable("ravengard-plus.config.map_center_marker_opacity"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.map_center_marker_opacity.description")))
+								.binding(100, () -> config.mapCenterMarkerOpacity, value -> config.mapCenterMarkerOpacity = value)
+								.controller(option -> IntegerSliderControllerBuilder.create(option).range(25, 100).step(5)
+										.formatValue(value -> Component.literal(value + "%")))
+								.build())
 						.option(Option.<Boolean>createBuilder()
 								.name(Component.translatable("ravengard-plus.config.exit_portal_markers"))
 								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.exit_portal_markers.description")))
@@ -330,6 +367,13 @@ public class RavengardConfig {
 										.binding(DEFAULT_DOOR_COLOR, () -> config.doorColor, value -> config.doorColor = value)
 										.controller(ColorControllerBuilder::create)
 										.build())
+								.option(Option.<Integer>createBuilder()
+										.name(Component.translatable("ravengard-plus.config.door_marker_opacity"))
+										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.door_marker_opacity.description")))
+										.binding(100, () -> config.doorMarkerOpacity, value -> config.doorMarkerOpacity = value)
+										.controller(option -> IntegerSliderControllerBuilder.create(option).range(25, 100).step(5)
+												.formatValue(value -> Component.literal(value + "%")))
+										.build())
 								.build())
 						.group(OptionGroup.createBuilder()
 								.name(Component.translatable("ravengard-plus.config.hitboxes"))
@@ -351,6 +395,42 @@ public class RavengardConfig {
 										.binding(Color.WHITE, () -> config.mobHitboxColor, value -> config.mobHitboxColor = value)
 										.controller(ColorControllerBuilder::create)
 										.build())
+								.build())
+						.build())
+				.category(ConfigCategory.createBuilder()
+						.name(Component.translatable("ravengard-plus.config.pings"))
+						.tooltip(Component.translatable("ravengard-plus.config.pings.description"))
+						.option(Option.<Boolean>createBuilder()
+								.name(Component.translatable("ravengard-plus.config.pings_enabled"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.pings_enabled.description")))
+								.binding(true, () -> config.pingsEnabled, value -> config.pingsEnabled = value)
+								.controller(BooleanControllerBuilder::create)
+								.build())
+						.option(Option.<Integer>createBuilder()
+								.name(Component.translatable("ravengard-plus.config.ping_duration"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.ping_duration.description")))
+								.binding(8, () -> config.pingDuration, value -> config.pingDuration = value)
+								.controller(option -> IntegerSliderControllerBuilder.create(option).range(1, 10).step(1)
+										.formatValue(value -> Component.translatable("ravengard-plus.config.seconds", value)))
+								.build())
+						.option(Option.<Integer>createBuilder()
+								.name(Component.translatable("ravengard-plus.config.ping_marker_opacity"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.ping_marker_opacity.description")))
+								.binding(100, () -> config.pingMarkerOpacity, value -> config.pingMarkerOpacity = value)
+								.controller(option -> IntegerSliderControllerBuilder.create(option).range(25, 100).step(5)
+										.formatValue(value -> Component.literal(value + "%")))
+								.build())
+						.option(Option.<Boolean>createBuilder()
+								.name(Component.translatable("ravengard-plus.config.ping_sound"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.ping_sound.description")))
+								.binding(true, () -> config.pingSoundEnabled, value -> config.pingSoundEnabled = value)
+								.controller(BooleanControllerBuilder::create)
+								.build())
+						.option(pingSoundOption)
+						.option(ButtonOption.createBuilder()
+								.name(Component.translatable("ravengard-plus.config.preview_ping_sound"))
+								.text(Component.translatable("ravengard-plus.config.preview"))
+								.action((screen, button) -> AbilityCooldownTracker.playSound(pingSoundOption.pendingValue()))
 								.build())
 						.build())
 				.save(HANDLER::save)

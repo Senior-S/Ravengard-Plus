@@ -85,6 +85,10 @@ public final class ExitPortalTracker {
 		return entity.position().add(0, PORTAL_HEIGHT / 2, 0);
 	}
 
+	public static boolean isPortal(Entity entity) {
+		return entity instanceof Interaction && isPortal(entity.getBbWidth(), entity.getBbHeight());
+	}
+
 	static boolean isPortal(float width, float height) {
 		return Math.abs(width - PORTAL_WIDTH) < SIZE_TOLERANCE && Math.abs(height - PORTAL_HEIGHT) < SIZE_TOLERANCE;
 	}

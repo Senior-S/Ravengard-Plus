@@ -4,6 +4,8 @@ import com.seniors.ravengardplus.client.ability.AbilityCooldownTracker;
 import com.seniors.ravengardplus.client.config.RavengardConfig;
 import com.seniors.ravengardplus.client.door.DoorTracker;
 import com.seniors.ravengardplus.client.marker.MapCenterMarker;
+import com.seniors.ravengardplus.client.ping.PingMarkers;
+import com.seniors.ravengardplus.client.ping.PingWheel;
 import com.seniors.ravengardplus.client.portal.ExitPortalTracker;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -27,6 +29,7 @@ public class GuiMixin {
 			DoorTracker.drawMarkers(graphics);
 			ExitPortalTracker.drawMarkers(graphics);
 			MapCenterMarker.draw(graphics);
+			PingMarkers.draw(graphics);
 		}
 	}
 
@@ -36,6 +39,9 @@ public class GuiMixin {
 			DeltaTracker deltaTracker,
 			CallbackInfo callbackInfo
 	) {
+		if (!Minecraft.getInstance().options.hideGui) {
+			PingWheel.draw(graphics);
+		}
 		RavengardConfig config = RavengardConfig.HANDLER.instance();
 		if (!config.abilityCooldownEnabled || Minecraft.getInstance().options.hideGui) {
 			return;

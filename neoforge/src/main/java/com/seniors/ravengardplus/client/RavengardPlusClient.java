@@ -11,6 +11,7 @@ import com.seniors.ravengardplus.client.door.DoorTracker;
 import com.seniors.ravengardplus.client.item.CrownReplacementDetector;
 import com.seniors.ravengardplus.client.item.IgnoredItems;
 import com.seniors.ravengardplus.client.minimap.MinimapReader;
+import com.seniors.ravengardplus.client.ping.PingWheel;
 import com.seniors.ravengardplus.client.portal.ExitPortalTracker;
 import com.seniors.ravengardplus.client.team.TeammateGlowTracker;
 import net.minecraft.client.KeyMapping;
@@ -53,11 +54,19 @@ public class RavengardPlusClient {
 				category
 		);
 		IgnoredItems.setKey(ignoreItem);
+		KeyMapping ping = new KeyMapping(
+				"key.ravengard-plus.ping",
+				InputConstants.Type.MOUSE,
+				InputConstants.MOUSE_BUTTON_MIDDLE,
+				category
+		);
+		PingWheel.setKey(ping);
 
 		modEventBus.addListener((RegisterKeyMappingsEvent event) -> {
 			event.registerCategory(category);
 			event.register(openConfig);
 			event.register(ignoreItem);
+			event.register(ping);
 		});
 		container.registerExtensionPoint(
 				IConfigScreenFactory.class,
@@ -80,6 +89,7 @@ public class RavengardPlusClient {
 			TeammateGlowTracker.tick(Minecraft.getInstance());
 			DoorTracker.tick(Minecraft.getInstance());
 			ExitPortalTracker.tick(Minecraft.getInstance());
+			PingWheel.tick(Minecraft.getInstance());
 		});
 		NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> {
 			Minecraft client = Minecraft.getInstance();
