@@ -9,6 +9,7 @@ import com.seniors.ravengardplus.client.config.RavengardConfig;
 import com.seniors.ravengardplus.client.debug.EntityInspector;
 import com.seniors.ravengardplus.client.door.DoorTracker;
 import com.seniors.ravengardplus.client.item.CrownReplacementDetector;
+import com.seniors.ravengardplus.client.item.IgnoredItems;
 import com.seniors.ravengardplus.client.minimap.MinimapReader;
 import com.seniors.ravengardplus.client.portal.ExitPortalTracker;
 import com.seniors.ravengardplus.client.team.TeammateGlowTracker;
@@ -18,6 +19,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.api.distmarker.Dist;
@@ -30,6 +32,7 @@ import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 @Mod(value = RavengardPlusClient.MOD_ID, dist = Dist.CLIENT)
 public class RavengardPlusClient {
@@ -44,10 +47,17 @@ public class RavengardPlusClient {
 				InputConstants.KEY_O,
 				category
 		);
+		KeyMapping ignoreItem = new KeyMapping(
+				"key.ravengard-plus.ignore_item",
+				InputConstants.KEY_H,
+				category
+		);
+		IgnoredItems.setKey(ignoreItem);
 
 		modEventBus.addListener((RegisterKeyMappingsEvent event) -> {
 			event.registerCategory(category);
 			event.register(openConfig);
+			event.register(ignoreItem);
 		});
 		container.registerExtensionPoint(
 				IConfigScreenFactory.class,
@@ -60,6 +70,7 @@ public class RavengardPlusClient {
 					return 1;
 				}))
 		));
+		NeoForge.EVENT_BUS.addListener((ItemTooltipEvent event) -> IgnoredItems.appendTooltip(event.getItemStack(), event.getToolTip()));
 		NeoForge.EVENT_BUS.addListener((ClientChatReceivedEvent.System event) ->
 				AbilityCooldownTracker.onGameMessage(event.getMessage().getString()));
 		NeoForge.EVENT_BUS.addListener((ClientTickEvent.Pre event) ->
@@ -86,12 +97,15 @@ public class RavengardPlusClient {
 			}
 			ArmorUpgradeDetector.update(client.player, candidates, config.armorUpgradeIndicatorEnabled);
 			AccessoryUpgradeDetector.update(inventory, candidates, config.accessoryUpgradeIndicatorEnabled);
+			AbstractContainerMenu openContainer = containerScreen == null || containerScreen.getMenu() == client.player.inventoryMenu
+					? null : containerScreen.getMenu();
+			CrownReplacementDetector.updateMostValuable(inventory, openContainer, config.mostValuableHighlightEnabled);
 			CrownReplacementDetector.update(
 					inventory,
-					containerScreen == null || containerScreen.getMenu() == client.player.inventoryMenu
-							? null : containerScreen.getMenu(),
+					openContainer,
 					config.crownReplacementEnabled,
-					config.crownReplacementIncludeHealthItems
+					config.crownReplacementIncludeHealthItems,
+					IgnoredItems::isIgnored
 			);
 
 			while (openConfig.consumeClick()) {

@@ -24,14 +24,18 @@ public class EntityHitboxDebugRendererMixin {
 	)
 	private Iterable<Entity> ravengardPlus$filterUnnecessaryHitboxes(ClientLevel level) {
 		Iterable<Entity> entities = level.entitiesForRendering();
-		if (!RavengardConfig.HANDLER.instance().hideArmorStandHitboxes) {
+		RavengardConfig config = RavengardConfig.HANDLER.instance();
+		boolean hideDecorations = config.hideArmorStandHitboxes;
+		// Hitboxes the mod forces on never include players, so they can't be used as an edge in PvP
+		boolean hidePlayers = config.alwaysShowHitboxes;
+		if (!hideDecorations && !hidePlayers) {
 			return entities;
 		}
 
-		return Iterables.filter(entities,
-				entity -> !(entity instanceof ArmorStand
+		return Iterables.filter(entities, entity -> !(hidePlayers && entity instanceof Player)
+				&& !(hideDecorations && (entity instanceof ArmorStand
 						|| entity instanceof Display.ItemDisplay
-						|| entity instanceof Display.TextDisplay));
+						|| entity instanceof Display.TextDisplay)));
 	}
 
 	@Redirect(
@@ -48,7 +52,9 @@ public class EntityHitboxDebugRendererMixin {
 			float partialTick,
 			boolean serverEntity
 	) {
-		RavengardConfig config = RavengardConfig.HANDLER.instance();
-		return GizmoStyle.stroke((entity instanceof Player ? config.playerHitboxColor : config.mobHitboxColor).getRGB());
+		// Players only show in Minecraft's own hitbox view, so they keep its color
+		return entity instanceof Player
+				? GizmoStyle.stroke(originalColor)
+				: GizmoStyle.stroke(RavengardConfig.HANDLER.instance().mobHitboxColor.getRGB());
 	}
 }

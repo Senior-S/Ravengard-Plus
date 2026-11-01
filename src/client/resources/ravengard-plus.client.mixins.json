@@ -11,6 +11,7 @@
 		"TeammateGlowMixin",
 		"DoorGlowMixin",
 		"ItemDisplayAccessor",
+		"ContainerScreenIgnoreMixin",
 		"DebugScreenEntryListMixin",
 		"DebugRendererMixin",
 		"EntityHitboxDebugRendererMixin"

@@ -18,23 +18,17 @@ Ravengard Plus adds clear inventory markers for item value and equipment upgrade
 
 ## Features
 
-### Crown indicators
+### Crown values
 
-Items with a Crown value in their lore receive a configurable color indicator. The default tiers are:
+While an inventory or container is open, each item with a Crown value shows the lore glyph and number in its upper-left corner, with separate glyph and number colors and an option to hide the glyph.
 
-- `0-4` Crowns: white
-- `5-9` Crowns: green
-- `10+` Crowns: red
-
-Soft slot tint is the default style. Pixel corners, a bottom stripe, side markers, and a full outline are also available. You can add or remove tiers and choose a color and maximum Crown value for each one.
+The player inventory screen shows the combined Crown value of carried and equipped items below the ability slots. Stack values are multiplied by item count, and container contents are excluded.
 
 ### Container replacement hints
 
 When every usable inventory slot is occupied, opening a container compares its Crown-valued items with the cheapest replaceable item you carry. A bright tint marks the inventory item to replace whenever the container offers something more valuable. Container items worth the same or less receive a light-gray tint. Accessory slots and the final hotbar slot remain reserved and do not count toward inventory fullness.
 
-An optional Crown-value overlay shows the lore glyph and number in the upper-left corner of each item by default, with separate glyph and number colors and an option to hide the glyph.
-
-The player inventory screen shows the combined Crown value of carried and equipped items below the ability slots. Stack values are multiplied by item count, and container contents are excluded.
+Health items like bandages are left out by default. To keep any other item from being highlighted, hover over it and press `H`. Its tooltip shows whether it's ignored, and pressing `H` again undoes it.
 
 ### Armor upgrades
 
@@ -50,7 +44,7 @@ When using an ability get a timer with configurable color and text scale, with s
 
 ### Hitboxes
 
-Hitboxes can remain visible without Minecraft's debug shortcut. Player and mob outlines use separate configurable colors, with bright red players and white mobs by default. Armor stand, item display, and text display hitboxes are hidden by default.
+Hitboxes can remain visible without Minecraft's debug shortcut. Other players' hitboxes are left out, and the rest use a configurable color, white by default. Armor stand, item display, and text display hitboxes are hidden by default.
 
 ### Entity full bright
 
@@ -60,7 +54,7 @@ Every entity renders at maximum brightness by default while world lighting stays
 
 Press `O` in game to open the configuration screen. You can rebind this key under Minecraft's Controls settings.
 
-The menu is powered by [YetAnotherConfigLib](https://modrinth.com/mod/yacl) and covers Crown tiers, indicator styles, feature toggles, and colors.
+The menu is powered by [YetAnotherConfigLib](https://modrinth.com/mod/yacl) and covers feature toggles, colors, and indicator styles.
 
 ## Translations
 

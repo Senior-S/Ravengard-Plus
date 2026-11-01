@@ -1,6 +1,5 @@
 package com.seniors.ravengardplus.client.config;
 
-import com.seniors.ravengardplus.client.ScreenCompat;
 import com.seniors.ravengardplus.client.RavengardPlusClient;
 import com.seniors.ravengardplus.client.ability.AbilityCooldownTracker;
 import dev.isxander.yacl3.api.ButtonOption;
@@ -14,14 +13,11 @@ import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
 import dev.isxander.yacl3.api.controller.ColorControllerBuilder;
 import dev.isxander.yacl3.api.controller.DropdownStringControllerBuilder;
 import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
-import dev.isxander.yacl3.api.controller.IntegerFieldControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
-import dev.isxander.yacl3.gui.YACLScreen;
 import dev.isxander.yacl3.platform.YACLPlatform;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -31,12 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RavengardConfig {
-	private static final Color DEFAULT_MEDIUM_COLOR = new Color(0x55FF55);
-	private static final Color DEFAULT_HIGH_COLOR = new Color(0xFF5555);
 	private static final Color DEFAULT_CROWN_GLYPH_COLOR = new Color(0xFFD34E);
+	private static final Color DEFAULT_MOST_VALUABLE_COLOR = new Color(0xFFC400);
 	private static final Color DEFAULT_ARMOR_UPGRADE_COLOR = new Color(0x55FF7F);
 	private static final Color DEFAULT_ACCESSORY_UPGRADE_COLOR = new Color(0x55D6FF);
-	private static final Color DEFAULT_PLAYER_HITBOX_COLOR = new Color(0xFF0000);
 	private static final Color DEFAULT_DOOR_COLOR = new Color(0xFFAA00);
 	private static final int DEFAULT_DOOR_RANGE = 24;
 	private static final String DEFAULT_ABILITY_SOUND = "minecraft:block.note_block.pling";
@@ -49,12 +43,6 @@ public class RavengardConfig {
 					.setJson5(true)
 					.build())
 			.build();
-
-	@SerialEntry
-	public boolean crownBordersEnabled = true;
-
-	@SerialEntry
-	public BorderStyle crownBorderStyle = BorderStyle.SOFT_TINT;
 
 	@SerialEntry
 	public boolean crownValueOverlayEnabled = true;
@@ -76,6 +64,16 @@ public class RavengardConfig {
 
 	@SerialEntry
 	public boolean crownReplacementIncludeHealthItems = false;
+
+	// Item type plus custom name, see IgnoredItems
+	@SerialEntry
+	public List<String> crownReplacementIgnoredItems = new ArrayList<>();
+
+	@SerialEntry
+	public boolean mostValuableHighlightEnabled = true;
+
+	@SerialEntry
+	public Color mostValuableHighlightColor = DEFAULT_MOST_VALUABLE_COLOR;
 
 	@SerialEntry
 	public boolean armorUpgradeIndicatorEnabled = true;
@@ -135,17 +133,7 @@ public class RavengardConfig {
 	public boolean hideArmorStandHitboxes = true;
 
 	@SerialEntry
-	public Color playerHitboxColor = DEFAULT_PLAYER_HITBOX_COLOR;
-
-	@SerialEntry
 	public Color mobHitboxColor = Color.WHITE;
-
-	@SerialEntry
-	public List<CrownTier> crownTiers = new ArrayList<>(List.of(
-			new CrownTier(4, Color.WHITE),
-			new CrownTier(9, DEFAULT_MEDIUM_COLOR),
-			new CrownTier(-1, DEFAULT_HIGH_COLOR)
-	));
 
 	public static Screen createScreen(Screen parent) {
 		RavengardConfig config = HANDLER.instance();
@@ -159,19 +147,7 @@ public class RavengardConfig {
 				.build();
 
 		ConfigCategory.Builder category = ConfigCategory.createBuilder()
-						.name(Component.translatable("ravengard-plus.config.crown_borders"))
-						.option(Option.<Boolean>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.enabled"))
-								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.enabled.description")))
-								.binding(true, () -> config.crownBordersEnabled, value -> config.crownBordersEnabled = value)
-								.controller(BooleanControllerBuilder::create)
-								.build())
-						.option(Option.<BorderStyle>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.border_style"))
-								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.border_style.description")))
-								.binding(BorderStyle.SOFT_TINT, () -> config.crownBorderStyle, value -> config.crownBorderStyle = value)
-								.controller(option -> EnumControllerBuilder.create(option).enumClass(BorderStyle.class))
-								.build())
+						.name(Component.translatable("ravengard-plus.config.crowns"))
 						.option(Option.<Boolean>createBuilder()
 								.name(Component.translatable("ravengard-plus.config.crown_value_overlay"))
 								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.crown_value_overlay.description")))
@@ -212,50 +188,25 @@ public class RavengardConfig {
 								.controller(BooleanControllerBuilder::create)
 								.build())
 						.option(ButtonOption.createBuilder()
-								.name(Component.translatable("ravengard-plus.config.add_tier"))
-								.text(Component.translatable("ravengard-plus.config.add"))
-								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.add_tier.description")))
+								.name(Component.translatable("ravengard-plus.config.crown_replacement_ignored"))
+								.text(Component.translatable("ravengard-plus.config.clear"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.crown_replacement_ignored.description")))
 								.action((screen, button) -> {
-									int nextMaximum = config.crownTiers.stream()
-											.mapToInt(tier -> tier.maximumValue)
-											.filter(maximum -> maximum >= 0)
-											.max()
-											.orElse(-1) + 1;
-									config.crownTiers.add(new CrownTier(nextMaximum, Color.WHITE));
-									saveAndRefresh(parent, screen);
+									config.crownReplacementIgnoredItems.clear();
+									HANDLER.save();
 								})
+								.build())
+						.option(Option.<Boolean>createBuilder()
+								.name(Component.translatable("ravengard-plus.config.most_valuable_highlight"))
+								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.most_valuable_highlight.description")))
+								.binding(true, () -> config.mostValuableHighlightEnabled, value -> config.mostValuableHighlightEnabled = value)
+								.controller(BooleanControllerBuilder::create)
+								.build())
+						.option(Option.<Color>createBuilder()
+								.name(Component.translatable("ravengard-plus.config.most_valuable_highlight_color"))
+								.binding(DEFAULT_MOST_VALUABLE_COLOR, () -> config.mostValuableHighlightColor, value -> config.mostValuableHighlightColor = value)
+								.controller(ColorControllerBuilder::create)
 								.build());
-
-		for (int index = 0; index < config.crownTiers.size(); index++) {
-			CrownTier tier = config.crownTiers.get(index);
-			Component tierName = tier.maximumValue < 0
-					? Component.translatable("ravengard-plus.config.tier_unlimited", index + 1)
-					: Component.translatable("ravengard-plus.config.tier", index + 1, tier.maximumValue);
-
-			category.group(OptionGroup.createBuilder()
-					.name(tierName)
-					.collapsed(true)
-					.option(Option.<Integer>createBuilder()
-							.name(Component.translatable("ravengard-plus.config.maximum_value"))
-							.description(OptionDescription.of(Component.translatable("ravengard-plus.config.maximum_value.description")))
-							.binding(tier.maximumValue, () -> tier.maximumValue, value -> tier.maximumValue = value)
-							.controller(option -> IntegerFieldControllerBuilder.create(option).min(-1))
-							.build())
-					.option(Option.<Color>createBuilder()
-							.name(Component.translatable("ravengard-plus.config.tier_color"))
-							.binding(tier.color, () -> tier.color, value -> tier.color = value)
-							.controller(ColorControllerBuilder::create)
-							.build())
-					.option(ButtonOption.createBuilder()
-							.name(Component.translatable("ravengard-plus.config.remove_tier"))
-							.text(Component.translatable("ravengard-plus.config.remove"))
-							.action((screen, button) -> {
-								config.crownTiers.remove(tier);
-								saveAndRefresh(parent, screen);
-							})
-							.build())
-					.build());
-		}
 
 		return YetAnotherConfigLib.createBuilder()
 				.title(Component.translatable("ravengard-plus.config.title"))
@@ -396,11 +347,6 @@ public class RavengardConfig {
 										.controller(BooleanControllerBuilder::create)
 										.build())
 								.option(Option.<Color>createBuilder()
-										.name(Component.translatable("ravengard-plus.config.player_hitbox_color"))
-										.binding(DEFAULT_PLAYER_HITBOX_COLOR, () -> config.playerHitboxColor, value -> config.playerHitboxColor = value)
-										.controller(ColorControllerBuilder::create)
-										.build())
-								.option(Option.<Color>createBuilder()
 										.name(Component.translatable("ravengard-plus.config.mob_hitbox_color"))
 										.binding(Color.WHITE, () -> config.mobHitboxColor, value -> config.mobHitboxColor = value)
 										.controller(ColorControllerBuilder::create)
@@ -410,31 +356,6 @@ public class RavengardConfig {
 				.save(HANDLER::save)
 				.build()
 				.generateScreen(parent);
-	}
-
-	private static void saveAndRefresh(Screen parent, YACLScreen screen) {
-		screen.finishOrSave();
-		HANDLER.save();
-		ScreenCompat.set(Minecraft.getInstance(), createScreen(parent));
-	}
-
-	public enum BorderStyle implements NameableEnum {
-		PIXEL_CORNERS("pixel_corners"),
-		BOTTOM_STRIPE("bottom_stripe"),
-		SIDE_MARKERS("side_markers"),
-		SOFT_TINT("soft_tint"),
-		FULL_OUTLINE("full_outline");
-
-		private final String translationKey;
-
-		BorderStyle(String translationKey) {
-			this.translationKey = translationKey;
-		}
-
-		@Override
-		public Component getDisplayName() {
-			return Component.translatable("ravengard-plus.config.border_style." + translationKey);
-		}
 	}
 
 	public enum DoorIndicatorStyle implements NameableEnum {
@@ -450,16 +371,6 @@ public class RavengardConfig {
 		@Override
 		public Component getDisplayName() {
 			return Component.translatable("ravengard-plus.config.door_indicator_style." + translationKey);
-		}
-	}
-
-	public static class CrownTier {
-		public int maximumValue;
-		public Color color;
-
-		public CrownTier(int maximumValue, Color color) {
-			this.maximumValue = maximumValue;
-			this.color = color;
 		}
 	}
 }

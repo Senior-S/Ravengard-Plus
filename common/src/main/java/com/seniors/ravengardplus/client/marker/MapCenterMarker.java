@@ -11,7 +11,8 @@ import net.minecraft.world.phys.Vec3;
 public final class MapCenterMarker {
 	private static final double HEIGHT_ABOVE_PLAYER = 3;
 	private static final String ICON = "\u2726";
-	private static final int ICON_COLOR = 0xFFFFAA00;
+	// Light purple, apart from the gold doors and light blue exit portals
+	private static final int ICON_COLOR = 0xFFFF55FF;
 	private static final int LABEL_COLOR = 0xFFFFFFFF;
 	private static final int DISTANCE_COLOR = 0xFFAAAAAA;
 

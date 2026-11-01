@@ -11,9 +11,11 @@ import net.minecraft.world.item.component.ItemLore;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public final class CrownReplacementDetector {
 	private static final Set<ItemStack> REJECTED_CONTAINER_ITEMS = Collections.newSetFromMap(new IdentityHashMap<>());
+	private static final Set<ItemStack> MOST_VALUABLE_CONTAINER_ITEMS = Collections.newSetFromMap(new IdentityHashMap<>());
 	private static ItemStack cheapestItem;
 
 	private CrownReplacementDetector() {
@@ -23,8 +25,14 @@ public final class CrownReplacementDetector {
 		update(inventory, menu, enabled, false);
 	}
 
-	// Health items are left out unless includeHealthItems is set, so they are never offered for replacement
 	public static void update(Inventory inventory, AbstractContainerMenu menu, boolean enabled, boolean includeHealthItems) {
+		update(inventory, menu, enabled, includeHealthItems, stack -> false);
+	}
+
+	// Health items are left out unless includeHealthItems is set, and items the player ignored are always
+	// left out, so neither is offered for replacement
+	public static void update(Inventory inventory, AbstractContainerMenu menu, boolean enabled, boolean includeHealthItems,
+			Predicate<ItemStack> ignored) {
 		cheapestItem = null;
 		REJECTED_CONTAINER_ITEMS.clear();
 		if (!enabled || inventory == null || menu == null) {
@@ -42,7 +50,7 @@ public final class CrownReplacementDetector {
 			if (stack.isEmpty()) {
 				return;
 			}
-			if (!includeHealthItems && isHealthItem(stack)) {
+			if (!includeHealthItems && isHealthItem(stack) || ignored.test(stack)) {
 				continue;
 			}
 			double value = LoreValueParser.find(stack, "Crown");
@@ -75,6 +83,36 @@ public final class CrownReplacementDetector {
 		if (hasBetterItem) {
 			cheapestItem = candidate;
 		}
+	}
+
+	// Marks the highest-priced items of an open container (every one, on a tie), whether or not the
+	// inventory is full, so the player knows what to take. The player's own slots are never marked.
+	public static void updateMostValuable(Inventory inventory, AbstractContainerMenu menu, boolean enabled) {
+		MOST_VALUABLE_CONTAINER_ITEMS.clear();
+		if (!enabled || inventory == null || menu == null) {
+			return;
+		}
+
+		double highest = -1;
+		for (Slot slot : menu.slots) {
+			if (slot.container == inventory) {
+				continue;
+			}
+			ItemStack stack = slot.getItem();
+			double value = LoreValueParser.find(stack, "Crown");
+			if (value < 0 || value < highest) {
+				continue;
+			}
+			if (value > highest) {
+				MOST_VALUABLE_CONTAINER_ITEMS.clear();
+				highest = value;
+			}
+			MOST_VALUABLE_CONTAINER_ITEMS.add(stack);
+		}
+	}
+
+	public static boolean isMostValuableContainerItem(ItemStack stack) {
+		return MOST_VALUABLE_CONTAINER_ITEMS.contains(stack);
 	}
 
 	// Healing consumables describe themselves as "Heals +50 HP over 5 seconds."
