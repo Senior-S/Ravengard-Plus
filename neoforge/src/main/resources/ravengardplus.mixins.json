@@ -15,10 +15,7 @@
 		"UpgradeIndicatorMixin",
 		"GuiGraphicsExtractorMixin",
 		"InventoryScreenMixin",
-		"HudMixin",
-		"DebugScreenEntryListMixin",
-		"DebugRendererMixin",
-		"EntityHitboxDebugRendererMixin"
+		"HudMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

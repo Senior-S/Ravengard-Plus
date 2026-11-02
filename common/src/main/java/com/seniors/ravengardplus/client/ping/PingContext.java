@@ -4,7 +4,6 @@ import com.seniors.ravengardplus.client.HudCompat;
 import com.seniors.ravengardplus.client.mixin.BossHealthOverlayAccessor;
 import com.seniors.ravengardplus.client.mixin.ItemDisplayAccessor;
 import com.seniors.ravengardplus.client.mixin.TextDisplayAccessor;
-import com.seniors.ravengardplus.client.portal.ExitPortalTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.player.LocalPlayer;
@@ -44,8 +43,17 @@ public final class PingContext {
 	private static final String NAMESPACE = "hypixel_ravengard";
 	private static final Pattern HEALTH = Pattern.compile("\\d+(\\.\\d+)?\\s*/\\s*\\d+.*$");
 	private static final Pattern NOT_NAME = Pattern.compile("[^\\p{L}\\p{N} '\\-]");
+	// Exit portals are usable through a 1.2 x 2.5 interaction
+	private static final float EXIT_PORTAL_WIDTH = 1.2F;
+	private static final float EXIT_PORTAL_HEIGHT = 2.5F;
+	private static final float SIZE_TOLERANCE = 0.01F;
 
 	private PingContext() {
+	}
+
+	private static boolean isExitPortal(Entity entity) {
+		return Math.abs(entity.getBbWidth() - EXIT_PORTAL_WIDTH) < SIZE_TOLERANCE
+				&& Math.abs(entity.getBbHeight() - EXIT_PORTAL_HEIGHT) < SIZE_TOLERANCE;
 	}
 
 	public enum Kind {
@@ -134,7 +142,7 @@ public final class PingContext {
 			return new Match(Kind.ITEM, item.getItem().getHoverName(), entity.position().add(0, 0.6, 0));
 		}
 		if (entity instanceof Interaction) {
-			if (ExitPortalTracker.isPortal(entity)) {
+			if (isExitPortal(entity)) {
 				return new Match(Kind.EXIT_PORTAL, null, entity.position().add(0, 1.5, 0));
 			}
 			// Mobs are an interaction hitbox riding an area effect cloud, with the body models next to it

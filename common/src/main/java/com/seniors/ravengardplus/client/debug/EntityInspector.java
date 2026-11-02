@@ -3,7 +3,6 @@ package com.seniors.ravengardplus.client.debug;
 import com.mojang.logging.LogUtils;
 import com.seniors.ravengardplus.client.minimap.MinimapReader;
 import com.seniors.ravengardplus.client.ping.PingContext;
-import com.seniors.ravengardplus.client.portal.ExitPortalTracker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -128,10 +127,6 @@ public final class EntityInspector {
 		}
 		MinimapReader.Minimap minimap = MinimapReader.current();
 		rows.add(row("Minimap", minimap.player() == null ? "not found" : minimap.hubOrTutorial() ? "hub or tutorial" : "in game"));
-		String portal = ExitPortalTracker.describe(entity);
-		if (portal != null) {
-			rows.add(row("Ravengard Plus", portal));
-		}
 		String ping = PingContext.describe(Minecraft.getInstance(), entity);
 		rows.add(row("Ping", ping == null ? "not recognized" : ping));
 		List<SynchedEntityData.DataValue<?>> values = entity.getEntityData().getNonDefaultValues();

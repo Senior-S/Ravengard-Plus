@@ -12,7 +12,6 @@ import com.seniors.ravengardplus.client.item.CrownReplacementDetector;
 import com.seniors.ravengardplus.client.item.IgnoredItems;
 import com.seniors.ravengardplus.client.minimap.MinimapReader;
 import com.seniors.ravengardplus.client.ping.PingWheel;
-import com.seniors.ravengardplus.client.portal.ExitPortalTracker;
 import com.seniors.ravengardplus.client.team.TeammateGlowTracker;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -66,7 +65,6 @@ public class RavengardPlusClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(MinimapReader::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(TeammateGlowTracker::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(DoorTracker::tick);
-		ClientTickEvents.END_CLIENT_TICK.register(ExitPortalTracker::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(PingWheel::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			RavengardConfig config = RavengardConfig.HANDLER.instance();

@@ -42,10 +42,6 @@ Necklaces, earrings, belts, and rings are compared with the matching accessory. 
 
 When using an ability get a timer with configurable color and text scale, with scale limited to 50-150%. The expiry sound is enabled by default, can use any registered Minecraft sound event, and can be previewed from the configuration screen.
 
-### Hitboxes
-
-Hitboxes can remain visible without Minecraft's debug shortcut. Other players' hitboxes are left out, and the rest use a configurable color, white by default. Armor stand, item display, and text display hitboxes are hidden by default.
-
 ### Entity full bright
 
 Every entity renders at maximum brightness by default while world lighting stays unchanged. This includes hostile and passive mobs, players, dropped items, projectiles, and display entities.

@@ -15,10 +15,7 @@
 		"BossHealthOverlayAccessor",
 		"MouseHandlerMixin",
 		"ChatComponentMixin",
-		"ContainerScreenIgnoreMixin",
-		"DebugScreenEntryListMixin",
-		"DebugRendererMixin",
-		"EntityHitboxDebugRendererMixin"
+		"ContainerScreenIgnoreMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

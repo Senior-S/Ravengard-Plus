@@ -12,7 +12,6 @@ import com.seniors.ravengardplus.client.item.CrownReplacementDetector;
 import com.seniors.ravengardplus.client.item.IgnoredItems;
 import com.seniors.ravengardplus.client.minimap.MinimapReader;
 import com.seniors.ravengardplus.client.ping.PingWheel;
-import com.seniors.ravengardplus.client.portal.ExitPortalTracker;
 import com.seniors.ravengardplus.client.team.TeammateGlowTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -88,7 +87,6 @@ public class RavengardPlusClient {
 			MinimapReader.tick(Minecraft.getInstance());
 			TeammateGlowTracker.tick(Minecraft.getInstance());
 			DoorTracker.tick(Minecraft.getInstance());
-			ExitPortalTracker.tick(Minecraft.getInstance());
 			PingWheel.tick(Minecraft.getInstance());
 		});
 		NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> {

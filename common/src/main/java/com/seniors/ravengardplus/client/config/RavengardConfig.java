@@ -125,9 +125,6 @@ public class RavengardConfig {
 	public int pingMarkerOpacity = 100;
 
 	@SerialEntry
-	public boolean exitPortalMarkersEnabled = true;
-
-	@SerialEntry
 	public boolean doorIndicatorsEnabled = true;
 
 	@SerialEntry
@@ -147,15 +144,6 @@ public class RavengardConfig {
 
 	@SerialEntry
 	public Color doorColor = DEFAULT_DOOR_COLOR;
-
-	@SerialEntry
-	public boolean alwaysShowHitboxes = false;
-
-	@SerialEntry
-	public boolean hideArmorStandHitboxes = true;
-
-	@SerialEntry
-	public Color mobHitboxColor = Color.WHITE;
 
 	public static Screen createScreen(Screen parent) {
 		RavengardConfig config = HANDLER.instance();
@@ -334,12 +322,6 @@ public class RavengardConfig {
 								.controller(option -> IntegerSliderControllerBuilder.create(option).range(25, 100).step(5)
 										.formatValue(value -> Component.literal(value + "%")))
 								.build())
-						.option(Option.<Boolean>createBuilder()
-								.name(Component.translatable("ravengard-plus.config.exit_portal_markers"))
-								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.exit_portal_markers.description")))
-								.binding(true, () -> config.exitPortalMarkersEnabled, value -> config.exitPortalMarkersEnabled = value)
-								.controller(BooleanControllerBuilder::create)
-								.build())
 						.group(OptionGroup.createBuilder()
 								.name(Component.translatable("ravengard-plus.config.doors"))
 								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.doors.description")))
@@ -373,27 +355,6 @@ public class RavengardConfig {
 										.binding(100, () -> config.doorMarkerOpacity, value -> config.doorMarkerOpacity = value)
 										.controller(option -> IntegerSliderControllerBuilder.create(option).range(25, 100).step(5)
 												.formatValue(value -> Component.literal(value + "%")))
-										.build())
-								.build())
-						.group(OptionGroup.createBuilder()
-								.name(Component.translatable("ravengard-plus.config.hitboxes"))
-								.description(OptionDescription.of(Component.translatable("ravengard-plus.config.hitboxes.description")))
-								.option(Option.<Boolean>createBuilder()
-										.name(Component.translatable("ravengard-plus.config.always_show_hitboxes"))
-										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.always_show_hitboxes.description")))
-										.binding(false, () -> config.alwaysShowHitboxes, value -> config.alwaysShowHitboxes = value)
-										.controller(BooleanControllerBuilder::create)
-										.build())
-								.option(Option.<Boolean>createBuilder()
-										.name(Component.translatable("ravengard-plus.config.hide_armor_stand_hitboxes"))
-										.description(OptionDescription.of(Component.translatable("ravengard-plus.config.hide_armor_stand_hitboxes.description")))
-										.binding(true, () -> config.hideArmorStandHitboxes, value -> config.hideArmorStandHitboxes = value)
-										.controller(BooleanControllerBuilder::create)
-										.build())
-								.option(Option.<Color>createBuilder()
-										.name(Component.translatable("ravengard-plus.config.mob_hitbox_color"))
-										.binding(Color.WHITE, () -> config.mobHitboxColor, value -> config.mobHitboxColor = value)
-										.controller(ColorControllerBuilder::create)
 										.build())
 								.build())
 						.build())

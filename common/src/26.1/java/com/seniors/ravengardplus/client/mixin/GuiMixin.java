@@ -6,7 +6,6 @@ import com.seniors.ravengardplus.client.door.DoorTracker;
 import com.seniors.ravengardplus.client.marker.MapCenterMarker;
 import com.seniors.ravengardplus.client.ping.PingMarkers;
 import com.seniors.ravengardplus.client.ping.PingWheel;
-import com.seniors.ravengardplus.client.portal.ExitPortalTracker;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -27,7 +26,6 @@ public class GuiMixin {
 	) {
 		if (!Minecraft.getInstance().options.hideGui) {
 			DoorTracker.drawMarkers(graphics);
-			ExitPortalTracker.drawMarkers(graphics);
 			MapCenterMarker.draw(graphics);
 			PingMarkers.draw(graphics);
 		}
